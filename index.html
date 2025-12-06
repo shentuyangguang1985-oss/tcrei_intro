@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TCREI 提示词工程框架 - 系统化的 AI 提示词设计方法">
+    <title>TCREI 提示词工程框架</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--gradient-1);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Framework Section */
+        .framework {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .framework-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .framework-card:nth-child(2)::before {
+            background: var(--gradient-2);
+        }
+
+        .framework-card:nth-child(3)::before {
+            background: var(--gradient-3);
+        }
+
+        .framework-card:nth-child(4)::before {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .framework-card:nth-child(5)::before {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .framework-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Example Section */
+        .example {
+            padding: 4rem 0;
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .example-box {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+        }
+
+        .example-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .example-label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .example-content {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary-color);
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        footer p {
+            color: var(--text-secondary);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .framework-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">TCREI</div>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#framework">框架</a></li>
+                        <li><a href="#example">示例</a></li>
+                        <li><a href="https://github.com/shentuyangguang1985-oss/tcrei_intro" target="_blank">GitHub</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>TCREI 提示词工程</h1>
+                <p>系统化的 AI 提示词设计框架，让你的 AI 交互更精准、更高效</p>
+                <a href="#framework" class="cta-button">开始探索</a>
+            </div>
+        </section>
+
+        <section id="framework" class="framework">
+            <div class="container">
+                <h2 class="section-title">五大核心要素</h2>
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <div class="card-icon">🧠</div>
+                        <h3 class="card-title">Thinking</h3>
+                        <p class="card-subtitle">思维方式</p>
+                        <p class="card-description">
+                            定义 AI 应该采用的思考模式和推理方式，如批判性思维、创造性思维、系统性思维等。
+                        </p>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="card-icon">📋</div>
+                        <h3 class="card-title">Context</h3>
+                        <p class="card-subtitle">上下文</p>
+                        <p class="card-description">
+                            提供必要的背景信息，包括项目背景、业务场景、技术栈和约束条件。
+                        </p>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="card-icon">👤</div>
+                        <h3 class="card-title">Role</h3>
+                        <p class="card-subtitle">角色设定</p>
+                        <p class="card-description">
+                            明确 AI 应该扮演的角色，如资深工程师、产品经理、数据分析师等。
+                        </p>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="card-icon">💡</div>
+                        <h3 class="card-title">Example</h3>
+                        <p class="card-subtitle">示例</p>
+                        <p class="card-description">
+                            提供具体的示例，帮助 AI 理解期望的输出格式和质量标准。
+                        </p>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="card-icon">📝</div>
+                        <h3 class="card-title">Instruction</h3>
+                        <p class="card-subtitle">指令</p>
+                        <p class="card-description">
+                            清晰、具体的任务指令，包括明确的目标、具体要求和输出格式。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="example" class="example">
+            <div class="container">
+                <h2 class="section-title">实际应用示例</h2>
+                <div class="example-box">
+                    <div class="example-item">
+                        <span class="example-label">🧠 Thinking</span>
+                        <div class="example-content">
+                            请使用系统性思维和批判性思维分析问题
+                        </div>
+                    </div>
+
+                    <div class="example-item">
+                        <span class="example-label">📋 Context</span>
+                        <div class="example-content">
+                            我正在开发一个电商平台的推荐系统，使用 Python + TensorFlow，<br>
+                            需要处理百万级用户数据
+                        </div>
+                    </div>
+
+                    <div class="example-item">
+                        <span class="example-label">👤 Role</span>
+                        <div class="example-content">
+                            请以资深机器学习工程师的角色
+                        </div>
+                    </div>
+
+                    <div class="example-item">
+                        <span class="example-label">💡 Example</span>
+                        <div class="example-content">
+                            输入: 用户浏览历史 [商品A, 商品B, 商品C]<br>
+                            输出: 推荐列表 [商品D, 商品E] + 推荐理由
+                        </div>
+                    </div>
+
+                    <div class="example-item">
+                        <span class="example-label">📝 Instruction</span>
+                        <div class="example-content">
+                            请设计一个协同过滤推荐算法，要求：<br>
+                            1. 考虑冷启动问题<br>
+                            2. 实时性要求在 100ms 内<br>
+                            3. 提供代码示例和性能优化建议
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 TCREI 提示词工程框架 | <a href="https://github.com/shentuyangguang1985-oss/tcrei_intro"
+                    target="_blank">GitHub</a></p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">让提示词工程更系统化、更高效 🚀</p>
+        </div>
+    </footer>
+</body>
+
+</html>
