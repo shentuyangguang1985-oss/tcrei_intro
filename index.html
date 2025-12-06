@@ -4,448 +4,814 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TCREI 提示词工程框架 - 系统化的 AI 提示词设计方法">
-    <title>TCREI 提示词工程框架</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap"
-        rel="stylesheet">
+    <title>TCREI：提示工程五步法 | 交互式学习指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: {
+                            50: '#fcfaf8',
+                            100: '#f7f3ef',
+                            200: '#efe6dd',
+                            300: '#e0d0c1',
+                            400: '#c8aa95',
+                            500: '#b0896f',
+                            600: '#9d7259',
+                            700: '#835d49',
+                            800: '#6d4e3f',
+                            900: '#594136',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #6366f1;
-            --secondary-color: #8b5cf6;
-            --accent-color: #ec4899;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
         body {
-            font-family: 'Inter', 'Noto Sans SC', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #fcfaf8;
+            /* coffee-50 */
+            color: #594136;
+            /* coffee-900 */
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Header */
-        header {
-            padding: 2rem 0;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 6rem 0;
-            text-align: center;
+        .chart-container {
             position: relative;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            animation: fadeInUp 0.8s ease-out 0.2s backwards;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background: var(--gradient-1);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
-            animation: fadeInUp 0.8s ease-out 0.4s backwards;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Framework Section */
-        .framework {
-            padding: 4rem 0;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            font-weight: 700;
-        }
-
-        .framework-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .framework-card {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .framework-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 4px;
-            background: var(--gradient-1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
         }
 
-        .framework-card:nth-child(2)::before {
-            background: var(--gradient-2);
+        .step-card {
+            transition: all 0.3s ease;
         }
 
-        .framework-card:nth-child(3)::before {
-            background: var(--gradient-3);
-        }
-
-        .framework-card:nth-child(4)::before {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
-        .framework-card:nth-child(5)::before {
-            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        }
-
-        .framework-card:hover {
+        .step-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
+        ::-webkit-scrollbar-track {
+            background: #f7f3ef;
         }
 
-        .card-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        ::-webkit-scrollbar-thumb {
+            background: #c8aa95;
+            border-radius: 4px;
         }
 
-        .card-description {
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-
-        /* Example Section */
-        .example {
-            padding: 4rem 0;
-            background: rgba(30, 41, 59, 0.5);
-        }
-
-        .example-box {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 2rem;
-        }
-
-        .example-item {
-            margin-bottom: 1.5rem;
-        }
-
-        .example-label {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: var(--gradient-1);
-            border-radius: 10px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .example-content {
-            background: rgba(15, 23, 42, 0.5);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 3px solid var(--primary-color);
-            color: var(--text-secondary);
-            font-family: 'Courier New', monospace;
-            line-height: 1.8;
-        }
-
-        /* Footer */
-        footer {
-            padding: 3rem 0;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 4rem;
-        }
-
-        footer p {
-            color: var(--text-secondary);
-        }
-
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .framework-grid {
-                grid-template-columns: 1fr;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b0896f;
         }
     </style>
+    <!-- Chosen Palette: Coffee/Latte Art (Warm Neutrals) to match the learning example and provide a calm reading environment. -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Introduction and the 'Tiny Crabs' Mnemonic.
+         2. Benefit Analysis (Radar Chart): Visualizing why TCREI matters.
+         3. The 5-Step Explorer: A linear but interactive journey through T, C, R, E, I.
+            - Task: Interactive Prompt Builder.
+            - Context: Context toggles.
+            - References: Before/After comparison.
+            - Evaluate: Interactive Checklist.
+            - Iterate: Visual Process Flow.
+         4. Case Study Breakdown: Analyzing the 'Coffee Article' example using the framework.
+         Why: This structure moves from "Why" (Benefits) to "How" (The Steps) to "Practice" (Case Study), suitable for learning a methodology.
+    -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart: To compare "Standard Prompts" vs "TCREI Prompts" on dimensions like Stability, Clarity, Quality. (Goal: Inform/Compare)
+         - Interactive Builder: Dropdowns to construct a 'Task' sentence. (Goal: Inform/Change - Active Learning)
+         - Toggles/Checklists: To simulate the thinking process of adding Context and Evaluation criteria. (Goal: Organize)
+         - Text Highlighting: In Case Study to map concepts to actual text. (Goal: Relationships)
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
 
-<body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">TCREI</div>
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="#framework">框架</a></li>
-                        <li><a href="#example">示例</a></li>
-                        <li><a href="https://github.com/shentuyangguang1985-oss/tcrei_intro" target="_blank">GitHub</a>
+<body class="antialiased selection:bg-coffee-200 selection:text-coffee-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-bold text-2xl text-coffee-800 tracking-tight">TCREI<span
+                            class="text-coffee-500 text-base font-normal ml-2">提示工程框架</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#intro"
+                        class="text-coffee-700 hover:text-coffee-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">简介</a>
+                    <a href="#benefits"
+                        class="text-coffee-700 hover:text-coffee-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">价值</a>
+                    <a href="#steps"
+                        class="text-coffee-700 hover:text-coffee-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">五步法详解</a>
+                    <a href="#case-study"
+                        class="text-coffee-700 hover:text-coffee-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">实战案例</a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-coffee-700 hover:text-coffee-900 focus:outline-none p-2">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-coffee-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#intro"
+                    class="block text-coffee-700 hover:text-coffee-900 hover:bg-coffee-100 px-3 py-2 rounded-md text-base font-medium">简介</a>
+                <a href="#benefits"
+                    class="block text-coffee-700 hover:text-coffee-900 hover:bg-coffee-100 px-3 py-2 rounded-md text-base font-medium">价值</a>
+                <a href="#steps"
+                    class="block text-coffee-700 hover:text-coffee-900 hover:bg-coffee-100 px-3 py-2 rounded-md text-base font-medium">五步法详解</a>
+                <a href="#case-study"
+                    class="block text-coffee-700 hover:text-coffee-900 hover:bg-coffee-100 px-3 py-2 rounded-md text-base font-medium">实战案例</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="intro" class="pt-32 pb-20 bg-gradient-to-b from-coffee-50 to-coffee-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-coffee-900 mb-6">
+                让 AI 从“猜谜”变成<span class="text-coffee-600">“专家”</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-coffee-700 leading-relaxed">
+                掌握 Google 推荐的 <strong>TCREI</strong> 提示工程框架，写出清晰、稳定、高质量的提示词。
+                <br>适用于写作、数据分析、代码生成等所有场景。
+            </p>
+
+            <!-- Mnemonic Card -->
+            <div
+                class="mt-12 bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto border border-coffee-200 transform hover:scale-[1.01] transition-transform duration-300">
+                <p class="text-sm font-bold text-coffee-400 uppercase tracking-widest mb-4">助记口诀 (MNEMONIC)</p>
+                <div class="flex flex-wrap justify-center gap-4 md:gap-8 text-center">
+                    <div class="mnemonic-item group cursor-pointer" onclick="scrollToStep('step-t')">
+                        <div
+                            class="w-16 h-16 md:w-20 md:h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-coffee-200 transition-colors text-3xl">
+                            🦀</div>
+                        <div class="text-2xl font-bold text-coffee-800">T</div>
+                        <div class="text-xs text-coffee-500 font-medium">Tiny (Task)</div>
+                    </div>
+                    <div class="mnemonic-item group cursor-pointer" onclick="scrollToStep('step-c')">
+                        <div
+                            class="w-16 h-16 md:w-20 md:h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-coffee-200 transition-colors text-3xl">
+                            🦀</div>
+                        <div class="text-2xl font-bold text-coffee-800">C</div>
+                        <div class="text-xs text-coffee-500 font-medium">Crabs (Context)</div>
+                    </div>
+                    <div class="mnemonic-item group cursor-pointer" onclick="scrollToStep('step-r')">
+                        <div
+                            class="w-16 h-16 md:w-20 md:h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-coffee-200 transition-colors text-3xl">
+                            🏄</div>
+                        <div class="text-2xl font-bold text-coffee-800">R</div>
+                        <div class="text-xs text-coffee-500 font-medium">Ride (References)</div>
+                    </div>
+                    <div class="mnemonic-item group cursor-pointer" onclick="scrollToStep('step-e')">
+                        <div
+                            class="w-16 h-16 md:w-20 md:h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-coffee-200 transition-colors text-3xl">
+                            🦖</div>
+                        <div class="text-2xl font-bold text-coffee-800">E</div>
+                        <div class="text-xs text-coffee-500 font-medium">Enormous (Evaluate)</div>
+                    </div>
+                    <div class="mnemonic-item group cursor-pointer" onclick="scrollToStep('step-i')">
+                        <div
+                            class="w-16 h-16 md:w-20 md:h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-coffee-200 transition-colors text-3xl">
+                            🦎</div>
+                        <div class="text-2xl font-bold text-coffee-800">I</div>
+                        <div class="text-xs text-coffee-500 font-medium">Iguanas (Iterate)</div>
+                    </div>
+                </div>
+                <p class="mt-6 text-coffee-600 font-medium italic">"Tiny Crabs Ride Enormous Iguanas"</p>
+                <p class="text-sm text-coffee-400 mt-1">（小螃蟹骑着巨型鬣蜥）</p>
+            </div>
+
+            <div class="mt-10">
+                <a href="#steps"
+                    class="inline-block bg-coffee-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-coffee-700 transition transform hover:-translate-y-1">开始学习框架</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Analysis (Data Viz) -->
+    <section id="benefits" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-coffee-900 mb-4">为什么你需要 TCREI？</h2>
+                    <p class="text-coffee-700 mb-6 text-lg">
+                        许多人使用 AI 时感到沮丧，因为输出不稳定或不符合预期。TCREI 通过结构化输入，将 AI 的能力从“随机生成”转变为“精准执行”。
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <div
+                                class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-1">
+                                ✓</div>
+                            <div class="ml-3 text-coffee-700"><strong>更清晰的意图：</strong>消除歧义，AI 不再猜谜。</div>
+                        </li>
+                        <li class="flex items-start">
+                            <div
+                                class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-1">
+                                ✓</div>
+                            <div class="ml-3 text-coffee-700"><strong>更稳定的输出：</strong>每次生成的结果质量一致。</div>
+                        </li>
+                        <li class="flex items-start">
+                            <div
+                                class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-1">
+                                ✓</div>
+                            <div class="ml-3 text-coffee-700"><strong>可复用性：</strong>建立一套可以在团队中共享的标准。</div>
                         </li>
                     </ul>
-                </nav>
+                </div>
+                <div class="bg-coffee-50 p-6 rounded-2xl shadow-inner">
+                    <h3 class="text-center text-coffee-800 font-semibold mb-4">提示词质量对比模型</h3>
+                    <div class="chart-container">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-coffee-400 mt-2">基于 Google AI Prompting Essentials 课程理念的数据化模拟</p>
+                </div>
             </div>
         </div>
-    </header>
+    </section>
 
-    <main>
-        <section class="hero">
-            <div class="container">
-                <h1>TCREI 提示词工程</h1>
-                <p>系统化的 AI 提示词设计框架，让你的 AI 交互更精准、更高效</p>
-                <a href="#framework" class="cta-button">开始探索</a>
+    <!-- The 5 Steps Detail Section -->
+    <section id="steps" class="py-16 bg-coffee-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-coffee-900">五步法深度解析</h2>
+                <p class="mt-2 text-coffee-600">点击下方卡片或按顺序浏览，掌握每个环节的核心技巧。</p>
             </div>
-        </section>
 
-        <section id="framework" class="framework">
-            <div class="container">
-                <h2 class="section-title">五大核心要素</h2>
-                <div class="framework-grid">
-                    <div class="framework-card">
-                        <div class="card-icon">🧠</div>
-                        <h3 class="card-title">Thinking</h3>
-                        <p class="card-subtitle">思维方式</p>
-                        <p class="card-description">
-                            定义 AI 应该采用的思考模式和推理方式，如批判性思维、创造性思维、系统性思维等。
-                        </p>
-                    </div>
-
-                    <div class="framework-card">
-                        <div class="card-icon">📋</div>
-                        <h3 class="card-title">Context</h3>
-                        <p class="card-subtitle">上下文</p>
-                        <p class="card-description">
-                            提供必要的背景信息，包括项目背景、业务场景、技术栈和约束条件。
-                        </p>
-                    </div>
-
-                    <div class="framework-card">
-                        <div class="card-icon">👤</div>
-                        <h3 class="card-title">Role</h3>
-                        <p class="card-subtitle">角色设定</p>
-                        <p class="card-description">
-                            明确 AI 应该扮演的角色，如资深工程师、产品经理、数据分析师等。
-                        </p>
-                    </div>
-
-                    <div class="framework-card">
-                        <div class="card-icon">💡</div>
-                        <h3 class="card-title">Example</h3>
-                        <p class="card-subtitle">示例</p>
-                        <p class="card-description">
-                            提供具体的示例，帮助 AI 理解期望的输出格式和质量标准。
-                        </p>
-                    </div>
-
-                    <div class="framework-card">
-                        <div class="card-icon">📝</div>
-                        <h3 class="card-title">Instruction</h3>
-                        <p class="card-subtitle">指令</p>
-                        <p class="card-description">
-                            清晰、具体的任务指令，包括明确的目标、具体要求和输出格式。
-                        </p>
-                    </div>
+            <!-- Step 1: Task -->
+            <div id="step-t" class="bg-white rounded-2xl shadow-lg overflow-hidden mb-12 step-card">
+                <div class="bg-coffee-600 p-6 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-white text-coffee-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl">T</span>
+                        Task（任务）
+                    </h3>
+                    <span class="text-coffee-200 text-sm font-mono bg-coffee-800 px-3 py-1 rounded">The
+                        Foundation</span>
                 </div>
-            </div>
-        </section>
+                <div class="p-8">
+                    <p class="text-coffee-700 mb-6">
+                        Task 是提示词的地基。它不仅仅是一句“帮我写...”，而是包含三个关键要素：<strong>目标 (Goal)</strong>、<strong>角色 (Role)</strong> 和
+                        <strong>格式 (Format)</strong>。
+                    </p>
 
-        <section id="example" class="example">
-            <div class="container">
-                <h2 class="section-title">实际应用示例</h2>
-                <div class="example-box">
-                    <div class="example-item">
-                        <span class="example-label">🧠 Thinking</span>
-                        <div class="example-content">
-                            请使用系统性思维和批判性思维分析问题
+                    <!-- Interactive Task Builder -->
+                    <div class="bg-coffee-50 border border-coffee-200 rounded-xl p-6">
+                        <h4 class="font-bold text-coffee-800 mb-4 flex items-center">
+                            <span class="text-xl mr-2">🛠️</span> 任务构建器 (Task Builder)
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-coffee-500 uppercase mb-1">1. 目标
+                                    (Goal)</label>
+                                <select id="task-goal"
+                                    class="w-full p-2 rounded border border-coffee-300 bg-white focus:outline-none focus:ring-2 focus:ring-coffee-500"
+                                    onchange="updateTaskPrompt()">
+                                    <option value="撰写一篇科普文章">撰写一篇科普文章</option>
+                                    <option value="分析这份销售数据">分析这份销售数据</option>
+                                    <option value="生成短视频脚本">生成短视频脚本</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-coffee-500 uppercase mb-1">2. 角色
+                                    (Role)</label>
+                                <select id="task-role"
+                                    class="w-full p-2 rounded border border-coffee-300 bg-white focus:outline-none focus:ring-2 focus:ring-coffee-500"
+                                    onchange="updateTaskPrompt()">
+                                    <option value="资深咖啡师">资深咖啡师</option>
+                                    <option value="幽默的数据分析师">幽默的数据分析师</option>
+                                    <option value="经验丰富的小学老师">经验丰富的小学老师</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-coffee-500 uppercase mb-1">3. 格式
+                                    (Format)</label>
+                                <select id="task-format"
+                                    class="w-full p-2 rounded border border-coffee-300 bg-white focus:outline-none focus:ring-2 focus:ring-coffee-500"
+                                    onchange="updateTaskPrompt()">
+                                    <option value="使用 Markdown 分段，包含标题">Markdown + 标题</option>
+                                    <option value="表格形式输出">表格形式</option>
+                                    <option value="三段式结构（引入-主体-结尾）">三段式文章</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="example-item">
-                        <span class="example-label">📋 Context</span>
-                        <div class="example-content">
-                            我正在开发一个电商平台的推荐系统，使用 Python + TensorFlow，<br>
-                            需要处理百万级用户数据
-                        </div>
-                    </div>
-
-                    <div class="example-item">
-                        <span class="example-label">👤 Role</span>
-                        <div class="example-content">
-                            请以资深机器学习工程师的角色
-                        </div>
-                    </div>
-
-                    <div class="example-item">
-                        <span class="example-label">💡 Example</span>
-                        <div class="example-content">
-                            输入: 用户浏览历史 [商品A, 商品B, 商品C]<br>
-                            输出: 推荐列表 [商品D, 商品E] + 推荐理由
-                        </div>
-                    </div>
-
-                    <div class="example-item">
-                        <span class="example-label">📝 Instruction</span>
-                        <div class="example-content">
-                            请设计一个协同过滤推荐算法，要求：<br>
-                            1. 考虑冷启动问题<br>
-                            2. 实时性要求在 100ms 内<br>
-                            3. 提供代码示例和性能优化建议
+                        <div class="bg-white p-4 rounded border border-coffee-200">
+                            <p class="text-xs text-coffee-400 mb-1">生成的任务指令：</p>
+                            <p id="task-output" class="text-coffee-800 font-mono text-lg">你是一名[角色]，请[目标]，输出要求为[格式]。</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
 
-    <footer>
-        <div class="container">
-            <p>© 2025 TCREI 提示词工程框架 | <a href="https://github.com/shentuyangguang1985-oss/tcrei_intro"
-                    target="_blank">GitHub</a></p>
-            <p style="margin-top: 1rem; font-size: 0.9rem;">让提示词工程更系统化、更高效 🚀</p>
+            <!-- Step 2: Context -->
+            <div id="step-c" class="bg-white rounded-2xl shadow-lg overflow-hidden mb-12 step-card">
+                <div class="bg-coffee-500 p-6 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-white text-coffee-500 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl">C</span>
+                        Context（上下文）
+                    </h3>
+                    <span class="text-coffee-100 text-sm font-mono bg-coffee-700 px-3 py-1 rounded">The Scope</span>
+                </div>
+                <div class="p-8">
+                    <p class="text-coffee-700 mb-6">
+                        Context 决定了 AI 输出的“语境”。没有上下文，AI 只能泛泛而谈。你需要提供受众、场景、语气和限制条件。
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-coffee-800 mb-3">常见的上下文要素：</h4>
+                            <ul class="space-y-2 text-sm text-coffee-600">
+                                <li class="flex items-center"><span
+                                        class="w-2 h-2 bg-coffee-400 rounded-full mr-2"></span><strong>受众：</strong>写给谁看？（新手
+                                    vs 专家）</li>
+                                <li class="flex items-center"><span
+                                        class="w-2 h-2 bg-coffee-400 rounded-full mr-2"></span><strong>场景：</strong>用在哪里？（公众号
+                                    vs 内部报告）</li>
+                                <li class="flex items-center"><span
+                                        class="w-2 h-2 bg-coffee-400 rounded-full mr-2"></span><strong>语气：</strong>什么风格？（严谨
+                                    vs 轻松）</li>
+                                <li class="flex items-center"><span
+                                        class="w-2 h-2 bg-coffee-400 rounded-full mr-2"></span><strong>限制：</strong>什么不能做？（不准编造）
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-coffee-50 p-4 rounded-xl border border-coffee-200">
+                            <h4 class="font-bold text-coffee-800 mb-2 text-center">语气调节器</h4>
+                            <p class="text-center text-sm text-coffee-500 mb-4">滑动查看不同语气对上下文的影响</p>
+                            <input type="range" min="0" max="2" value="1"
+                                class="w-full h-2 bg-coffee-200 rounded-lg appearance-none cursor-pointer accent-coffee-600"
+                                id="tone-slider" oninput="updateContextTone()">
+                            <div class="flex justify-between text-xs text-coffee-500 mt-1">
+                                <span>严谨专业</span>
+                                <span>温暖科普</span>
+                                <span>幽默搞怪</span>
+                            </div>
+                            <div id="tone-output"
+                                class="mt-4 p-3 bg-white rounded border border-coffee-200 text-coffee-700 italic text-sm">
+                                "本文受众为咖啡初学者，请保持语气温暖、平易近人，像朋友聊天一样。"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: References -->
+            <div id="step-r" class="bg-white rounded-2xl shadow-lg overflow-hidden mb-12 step-card">
+                <div class="bg-coffee-700 p-6 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-white text-coffee-700 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl">R</span>
+                        References（示例）
+                    </h3>
+                    <span class="text-coffee-300 text-sm font-mono bg-coffee-900 px-3 py-1 rounded">The Gold
+                        Standard</span>
+                </div>
+                <div class="p-8">
+                    <p class="text-coffee-700 mb-6">
+                        这是最强的一步。给 AI 一个“黄金样例”（Few-shot Prompting），它能立即对齐你的风格和质量要求。
+                    </p>
+
+                    <div class="bg-white border-2 border-dashed border-coffee-300 rounded-xl p-6 relative">
+                        <div
+                            class="absolute top-0 right-0 bg-coffee-100 text-coffee-800 text-xs font-bold px-2 py-1 rounded-bl-xl rounded-tr-xl">
+                            对比演示</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="opacity-50">
+                                <h4 class="font-bold text-gray-500 mb-2">❌ 没有示例 (0-shot)</h4>
+                                <div class="bg-gray-100 p-3 rounded text-sm text-gray-600 h-32 overflow-y-auto">
+                                    咖啡是一种冲泡饮料。它通常是热的。有很多种类，比如拿铁和美式。味道苦。
+                                    <br><br>
+                                    <em class="text-xs">（AI 只能根据概率生成最普通的回答）</em>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-coffee-700 mb-2">✅ 有示例 (Few-shot)</h4>
+                                <div
+                                    class="bg-coffee-50 p-3 rounded text-sm text-coffee-800 h-32 overflow-y-auto border border-coffee-200">
+                                    <strong>示例风格：</strong>“当你第一次走进一家精品咖啡店，你可能会被菜单上的名字吓到...”
+                                    <br><br>
+                                    <strong>AI 输出：</strong>“清晨的第一缕阳光洒在咖啡豆上，手冲壶的水流缓缓注下。你是否也曾好奇，这一杯黑色液体背后的故事？”
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-center text-sm font-medium text-coffee-600">只需给出一句话或一段模板，AI 的表现力立刻提升一个层级。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Evaluate -->
+            <div id="step-e" class="bg-white rounded-2xl shadow-lg overflow-hidden mb-12 step-card">
+                <div class="bg-coffee-600 p-6 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-white text-coffee-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl">E</span>
+                        Evaluate（评估标准）
+                    </h3>
+                    <span class="text-coffee-200 text-sm font-mono bg-coffee-800 px-3 py-1 rounded">The Rules</span>
+                </div>
+                <div class="p-8">
+                    <p class="text-coffee-700 mb-4">
+                        告诉 AI 什么是“正确答案”。设置明确的硬性指标，让 AI 进行自我检查。
+                    </p>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <p class="text-sm text-yellow-800">
+                            <strong>关键点：</strong> 如果没有评估标准，你很难责怪 AI 做得不对，因为它不知道标准是什么。
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-coffee-800">常见的评估清单：</h4>
+                        <div class="flex items-center p-2 bg-coffee-50 rounded hover:bg-coffee-100 transition">
+                            <input type="checkbox" checked disabled
+                                class="h-4 w-4 text-coffee-600 rounded border-coffee-300">
+                            <span class="ml-3 text-coffee-700">必须分成 4 个小节</span>
+                        </div>
+                        <div class="flex items-center p-2 bg-coffee-50 rounded hover:bg-coffee-100 transition">
+                            <input type="checkbox" checked disabled
+                                class="h-4 w-4 text-coffee-600 rounded border-coffee-300">
+                            <span class="ml-3 text-coffee-700">必须包含关键要点列表</span>
+                        </div>
+                        <div class="flex items-center p-2 bg-coffee-50 rounded hover:bg-coffee-100 transition">
+                            <input type="checkbox" checked disabled
+                                class="h-4 w-4 text-coffee-600 rounded border-coffee-300">
+                            <span class="ml-3 text-coffee-700">不得编造不存在的信息（幻觉抑制）</span>
+                        </div>
+                        <div class="flex items-center p-2 bg-coffee-50 rounded hover:bg-coffee-100 transition">
+                            <input type="checkbox" checked disabled
+                                class="h-4 w-4 text-coffee-600 rounded border-coffee-300">
+                            <span class="ml-3 text-coffee-700">语言需要通俗，避免行话堆砌</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Iterate -->
+            <div id="step-i" class="bg-white rounded-2xl shadow-lg overflow-hidden step-card">
+                <div class="bg-coffee-800 p-6 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-white text-coffee-800 rounded-full w-10 h-10 flex items-center justify-center mr-4 text-xl">I</span>
+                        Iterate（迭代）
+                    </h3>
+                    <span class="text-coffee-300 text-sm font-mono bg-black bg-opacity-30 px-3 py-1 rounded">The
+                        Refinement</span>
+                </div>
+                <div class="p-8">
+                    <p class="text-coffee-700 mb-6">
+                        第一次输出往往不是最终答案。与 AI 的交互是一个<strong>对话过程</strong>，而不是一次性命令。
+                    </p>
+
+                    <div class="relative">
+                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-coffee-200"></div>
+
+                        <div class="relative pl-12 mb-8">
+                            <div
+                                class="absolute left-0 w-8 h-8 bg-coffee-200 rounded-full flex items-center justify-center font-bold text-white text-sm">
+                                1</div>
+                            <h4 class="font-bold text-coffee-800">初次生成</h4>
+                            <p class="text-sm text-coffee-600">AI 生成了草稿，但感觉有点太长了，而且不够生动。</p>
+                        </div>
+
+                        <div class="relative pl-12 mb-8">
+                            <div
+                                class="absolute left-0 w-8 h-8 bg-coffee-400 rounded-full flex items-center justify-center font-bold text-white text-sm">
+                                2</div>
+                            <h4 class="font-bold text-coffee-800">迭代指令 1</h4>
+                            <div
+                                class="bg-coffee-50 p-2 rounded border border-coffee-200 text-sm italic text-coffee-700">
+                                "很好，但请把篇幅缩减 20%，并加入更多比喻，让它读起来更有趣。"
+                            </div>
+                        </div>
+
+                        <div class="relative pl-12">
+                            <div
+                                class="absolute left-0 w-8 h-8 bg-coffee-600 rounded-full flex items-center justify-center font-bold text-white text-sm">
+                                3</div>
+                            <h4 class="font-bold text-coffee-800">迭代指令 2</h4>
+                            <div
+                                class="bg-coffee-50 p-2 rounded border border-coffee-200 text-sm italic text-coffee-700">
+                                "现在请把第二段关于产地的部分，改写成一个具体的表格，对比埃塞俄比亚和哥伦比亚的豆子。"
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mt-6 text-center font-bold text-coffee-700">每一次迭代，都是在“训练”当前的对话上下文。</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Case Study Section -->
+    <section id="case-study" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-coffee-900 mb-8 text-center">☕ 完整实战案例：公众号文章生成</h2>
+            <p class="text-center text-coffee-600 mb-12 max-w-2xl mx-auto">
+                这是一个完整的 TCREI 提示词示例。点击上方的标签（T, C, R, E, I）来高亮显示提示词中对应的部分，理解它们是如何组合的。
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Controls -->
+                <div class="lg:col-span-1 space-y-4">
+                    <button onclick="highlightCase('all')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 font-bold text-coffee-900 transition-colors bg-coffee-50">
+                        显示全部 (Complete Prompt)
+                    </button>
+                    <button onclick="highlightCase('t')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 transition-colors group">
+                        <span
+                            class="inline-block w-6 h-6 rounded bg-coffee-600 text-white text-center text-sm leading-6 mr-2">T</span>
+                        Task (任务与角色)
+                    </button>
+                    <button onclick="highlightCase('c')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 transition-colors">
+                        <span
+                            class="inline-block w-6 h-6 rounded bg-coffee-500 text-white text-center text-sm leading-6 mr-2">C</span>
+                        Context (上下文)
+                    </button>
+                    <button onclick="highlightCase('r')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 transition-colors">
+                        <span
+                            class="inline-block w-6 h-6 rounded bg-coffee-700 text-white text-center text-sm leading-6 mr-2">R</span>
+                        References (示例)
+                    </button>
+                    <button onclick="highlightCase('e')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 transition-colors">
+                        <span
+                            class="inline-block w-6 h-6 rounded bg-coffee-600 text-white text-center text-sm leading-6 mr-2">E</span>
+                        Evaluate (评估)
+                    </button>
+                    <button onclick="highlightCase('i')"
+                        class="w-full text-left px-4 py-3 rounded-lg border border-coffee-200 hover:bg-coffee-50 focus:outline-none focus:ring-2 focus:ring-coffee-500 transition-colors">
+                        <span
+                            class="inline-block w-6 h-6 rounded bg-coffee-800 text-white text-center text-sm leading-6 mr-2">I</span>
+                        Iterate (迭代指令)
+                    </button>
+                </div>
+
+                <!-- Code View -->
+                <div
+                    class="lg:col-span-2 bg-gray-50 p-6 rounded-xl border border-gray-200 font-mono text-sm leading-relaxed overflow-x-auto shadow-inner h-[600px] overflow-y-auto">
+                    <!-- Task -->
+                    <div id="case-t" class="transition-opacity duration-300 p-2 rounded hover:bg-white">
+                        <span class="text-coffee-600 font-bold opacity-50 select-none">// Task: 角色 + 目标 + 格式</span><br>
+                        你是一位“精品咖啡科普作者 + 公众号文章排版专家”。<br>
+                        请根据给定主题生成一篇适合发布到公众号的咖啡知识科普文章。<br>
+                        要求文章结构清晰，使用 Markdown 格式，语言通俗易懂，包含至少 3 个可视化举例（如豆种、烘焙度、产地差异），并在末尾加入“今日咖啡小建议”。
+                    </div>
+                    <br>
+                    <!-- Context -->
+                    <div id="case-c" class="transition-opacity duration-300 p-2 rounded hover:bg-white">
+                        <span class="text-coffee-500 font-bold opacity-50 select-none">// Context: 受众 + 场景 +
+                            语气</span><br>
+                        本内容用于咖啡品牌“墨咖 MoKa”的公众号。<br>
+                        目标读者是刚接触精品咖啡的人（20-40岁），想从零开始了解手冲、风味、豆子选择。<br>
+                        语气要求不能太专业，要轻松、有温度，要帮助读者“看完能学到一件立刻能做的事”。
+                    </div>
+                    <br>
+                    <!-- References -->
+                    <div id="case-r" class="transition-opacity duration-300 p-2 rounded hover:bg-white">
+                        <span class="text-coffee-700 font-bold opacity-50 select-none">// References: 模仿风格</span><br>
+                        请模仿以下风格：开头用生活场景引入，中间按主题拆分 3–4 小节，每节给一个具体案例。<br>
+                        示例风格：“当你第一次走进一家精品咖啡店，你可能会被菜单上的名字吓到。耶加雪菲？瑰夏？处理法？今天这篇文章，我们就从最简单的入门开始……”
+                    </div>
+                    <br>
+                    <!-- Evaluate -->
+                    <div id="case-e" class="transition-opacity duration-300 p-2 rounded hover:bg-white">
+                        <span class="text-coffee-600 font-bold opacity-50 select-none">// Evaluate: 硬性标准</span><br>
+                        最终文章必须满足：<br>
+                        1. 结构至少 4 小节<br>
+                        2. 每节必须包含“举例说明”<br>
+                        3. 不能出现捏造的咖啡知识<br>
+                        4. 必须适合公众号阅读（段落简短、视觉清晰）
+                    </div>
+                    <br>
+                    <!-- Iterate -->
+                    <div id="case-i" class="transition-opacity duration-300 p-2 rounded hover:bg-white">
+                        <span class="text-coffee-800 font-bold opacity-50 select-none">// Iterate: 预设的迭代逻辑</span><br>
+                        如果我提供主题（如“手冲入门指南”），你需要自动根据主题生成最终文章。<br>
+                        如果我需要优化排版或调整风格，我会继续反馈，你需要根据反馈修正文案。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-coffee-900 text-coffee-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">TCREI</h2>
+            <p class="mb-8">最值得掌握的 AI 学习方法论</p>
+            <div class="border-t border-coffee-800 pt-8 text-sm text-coffee-400">
+                <p>基于 Google AI Prompting Essentials 核心总结</p>
+                <p class="mt-2">Created for TCREI Interactive Guide</p>
+            </div>
         </div>
     </footer>
+
+    <!-- Scripts -->
+    <script>
+        // --- 1. Navigation Logic ---
+        const navbar = document.getElementById('navbar');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.replace('glass-panel', 'bg-white');
+            } else {
+                navbar.classList.remove('shadow-md');
+                navbar.classList.replace('bg-white', 'glass-panel');
+            }
+        });
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        function scrollToStep(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                const offset = 100; // Adjust for fixed header
+                const bodyRect = document.body.getBoundingClientRect().top;
+                const elementRect = element.getBoundingClientRect().top;
+                const elementPosition = elementRect - bodyRect;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }
+
+        // --- 2. Chart.js Implementation (Impact Radar Chart) ---
+        // Goal: Inform/Compare - Visualizing the benefits of TCREI
+        const ctx = document.getElementById('impactChart').getContext('2d');
+        const impactChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    '意图清晰度',
+                    '输出稳定性',
+                    '风格匹配度',
+                    '结构完整性',
+                    '减少幻觉'
+                ],
+                datasets: [{
+                    label: '普通提示词 (Generic Prompt)',
+                    data: [40, 30, 20, 40, 30],
+                    fill: true,
+                    backgroundColor: 'rgba(156, 163, 175, 0.2)', // Gray
+                    borderColor: 'rgb(156, 163, 175)',
+                    pointBackgroundColor: 'rgb(156, 163, 175)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(156, 163, 175)'
+                }, {
+                    label: 'TCREI 提示词',
+                    data: [90, 85, 95, 90, 80],
+                    fill: true,
+                    backgroundColor: 'rgba(176, 137, 111, 0.5)', // Coffee-500
+                    borderColor: 'rgb(131, 93, 73)', // Coffee-700
+                    pointBackgroundColor: 'rgb(131, 93, 73)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(131, 93, 73)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true,
+                            color: 'rgba(0,0,0,0.1)'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: {
+                            display: false // hide numbers for cleaner look
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 12,
+                                family: "'Noto Sans SC', sans-serif"
+                            },
+                            color: '#594136'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            family: "'Noto Sans SC', sans-serif",
+                            color: '#594136'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(89, 65, 54, 0.9)',
+                        titleFont: { family: "'Noto Sans SC', sans-serif" },
+                        bodyFont: { family: "'Noto Sans SC', sans-serif" }
+                    }
+                }
+            }
+        });
+
+        // --- 3. Interactive Task Builder Logic ---
+        // Goal: Inform/Change - Active learning by doing
+        function updateTaskPrompt() {
+            const goal = document.getElementById('task-goal').value;
+            const role = document.getElementById('task-role').value;
+            const format = document.getElementById('task-format').value;
+
+            const outputElement = document.getElementById('task-output');
+
+            // Simple logic to assemble the prompt based on "Task = Goal + Role + Format"
+            // Adding a slight typing effect simulation or highlight
+            outputElement.innerHTML = `你是一名<span class="text-coffee-600 font-bold bg-coffee-100 px-1 rounded">${role}</span>，请<span class="text-coffee-600 font-bold bg-coffee-100 px-1 rounded">${goal}</span>，输出要求为<span class="text-coffee-600 font-bold bg-coffee-100 px-1 rounded">${format}</span>。`;
+        }
+
+        // Initialize once
+        updateTaskPrompt();
+
+        // --- 4. Interactive Context Logic ---
+        // Goal: Change - Seeing how parameters affect instructions
+        function updateContextTone() {
+            const val = document.getElementById('tone-slider').value;
+            const output = document.getElementById('tone-output');
+
+            const tones = [
+                '"本文受众为行业专家，请保持语气严谨、客观，使用专业术语，引用数据支持观点。"', // 0
+                '"本文受众为咖啡初学者，请保持语气温暖、平易近人，像朋友聊天一样，多用比喻。"', // 1
+                '"本文受众为Z世代年轻人，请保持语气幽默、搞怪，可以使用网络流行语，风格参考小红书。"' // 2
+            ];
+
+            output.innerText = tones[val];
+            output.classList.remove('fade-in');
+            void output.offsetWidth; // trigger reflow
+            output.classList.add('fade-in');
+        }
+
+        // --- 5. Case Study Highlighting Logic ---
+        // Goal: Relationships - Connecting abstract concepts to concrete text
+        function highlightCase(part) {
+            const parts = ['t', 'c', 'r', 'e', 'i'];
+
+            parts.forEach(p => {
+                const el = document.getElementById(`case-${p}`);
+                if (part === 'all' || part === p) {
+                    el.classList.remove('opacity-20');
+                    el.classList.add('opacity-100', 'bg-coffee-50', 'border-l-4', 'border-coffee-500');
+                    if (part === p) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('ring-2', 'ring-coffee-300'); // Add focus ring
+                    } else {
+                        el.classList.remove('ring-2', 'ring-coffee-300');
+                    }
+                } else {
+                    el.classList.remove('opacity-100', 'bg-coffee-50', 'border-l-4', 'border-coffee-500', 'ring-2', 'ring-coffee-300');
+                    el.classList.add('opacity-20');
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
