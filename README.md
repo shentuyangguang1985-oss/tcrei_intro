@@ -1,105 +1,63 @@
-# TCREI 提示词工程
+# TCREI：提示工程五步法 (Interactive Guide)
 
-## 项目简介
+![TCREI Concept](https://img.shields.io/badge/Prompt-Engineering-coffee) ![Status](https://img.shields.io/badge/Status-Active-success)
 
-TCREI (Thinking, Context, Role, Example, Instruction) 是一个系统化的提示词工程框架,旨在帮助用户更好地与 AI 进行交互,获得更精准、更有价值的回复。
+> **让 AI 从“猜谜”变成“专家”**
 
-## 框架说明
+这是一个交互式的学习指南，旨在帮助你掌握 **TCREI** 提示工程框架。通过结构化的输入，将 AI 的能力从随机生成转变为精准执行。
 
-TCREI 框架包含五个核心要素:
+🔗 **在线体验**: [https://shentuyangguang1985-oss.github.io/tcrei_intro/](https://shentuyangguang1985-oss.github.io/tcrei_intro/)
 
-### 🧠 Thinking (思维方式)
-定义 AI 应该采用的思考模式和推理方式,例如:
-- 批判性思维
-- 创造性思维
-- 系统性思维
-- 逻辑推理
+## 📚 什么是 TCREI？
 
-### 📋 Context (上下文)
-提供必要的背景信息,帮助 AI 理解问题的完整场景:
-- 项目背景
-- 业务场景
-- 技术栈
-- 约束条件
+TCREI 是一个由 Google 推荐的提示词设计框架，包含五个核心要素，助记口诀为 **"Tiny Crabs Ride Enormous Iguanas"**（小螃蟹骑着巨型鬣蜥）。
 
-### 👤 Role (角色设定)
-明确 AI 应该扮演的角色,例如:
-- 资深软件工程师
-- 产品经理
-- 数据分析师
-- 技术顾问
+| 简写 | 全称 (English) | 中文 | 核心作用 |
+| :---: | :--- | :--- | :--- |
+| **T** | **Task** | 任务 | 奠定基石（目标 + 角色 + 格式） |
+| **C** | **Context** | 上下文 | 设定语境（受众、场景、限制） |
+| **R** | **References** | 示例 | 黄金标准（Few-shot prompting） |
+| **E** | **Evaluate** | 评估 | 质量把控（硬性指标检查） |
+| **I** | **Iterate** | 迭代 | 持续优化（与 AI 的对话过程） |
 
-### 💡 Example (示例)
-提供具体的示例,帮助 AI 理解期望的输出格式和质量:
-- 输入示例
-- 输出示例
-- 格式规范
+## 🌟 项目特色
 
-### 📝 Instruction (指令)
-清晰、具体的任务指令:
-- 明确的目标
-- 具体的要求
-- 输出格式
-- 评估标准
+本项目不仅仅是一个文档，而是一个**单页交互式应用 (SPA)**，包含：
 
-## 使用方法
+- **🦀 助记口诀卡片**：生动的 Emoji 帮助记忆框架步骤。
+- **📊 交互式图表**：使用 Chart.js 展示 TCREI 对比普通提示词在清晰度、稳定性上的提升。
+- **🛠️ 任务构建器**：交互式下拉菜单，体验由"目标+角色+格式"组成的精准指令。
+- **🧘‍♀️ 语气调节器**：滑动滑块，实时查看不同语气对上下文指令的影响。
+- **📝 实战案例拆解**：完整的"公众号文章生成"案例，支持点击高亮，通过代码视角解析提示词结构。
 
-1. **明确目标**: 确定你想要 AI 帮助解决的问题
-2. **应用框架**: 按照 TCREI 框架组织你的提示词
-3. **迭代优化**: 根据输出结果调整提示词
-4. **总结经验**: 记录有效的提示词模板
+## 🚀 快速开始
 
-## 示例
+### 1. 访问网页
+直接点击 [在线演示](https://shentuyangguang1985-oss.github.io/tcrei_intro/) 开始学习。
 
-```markdown
-【Thinking】请使用系统性思维和批判性思维分析问题
+### 2. 本地运行
+如果你想在本地查看或修改源码：
 
-【Context】我正在开发一个电商平台的推荐系统,使用 Python + TensorFlow,
-需要处理百万级用户数据
-
-【Role】请以资深机器学习工程师的角色
-
-【Example】
-输入: 用户浏览历史 [商品A, 商品B, 商品C]
-输出: 推荐列表 [商品D, 商品E] + 推荐理由
-
-【Instruction】请设计一个协同过滤推荐算法,要求:
-1. 考虑冷启动问题
-2. 实时性要求在 100ms 内
-3. 提供代码示例和性能优化建议
+```bash
+git clone https://github.com/shentuyangguang1985-oss/tcrei_intro.git
+cd tcrei_intro
+# 直接用浏览器打开 index.html 即可
+open index.html
 ```
 
-## 最佳实践
-
-- ✅ **具体明确**: 避免模糊的描述,提供具体的细节
-- ✅ **结构化**: 使用清晰的结构组织提示词
-- ✅ **提供示例**: 用例子说明期望的输出
-- ✅ **迭代优化**: 根据结果不断调整提示词
-- ❌ **避免过于简单**: 单一的问题往往得不到深入的回答
-- ❌ **避免信息过载**: 不要在一个提示词中塞入过多内容
-
-## 项目结构
+## 📁 项目结构
 
 ```
 tcrei_intro/
-├── README.md          # 项目说明文档
-├── TCREI/            # TCREI 框架相关资源
-│   └── index.html    # 框架介绍页面
-└── .gitignore        # Git 忽略文件配置
+├── index.html        # 核心文件：包含所有逻辑、样式和交互代码
+└── README.md         # 项目说明
 ```
+*注：本项目采用 Zero-Dependency 设计（除 CDN 引入的 Tailwind 和 Chart.js），单文件即可运行，极致轻量。*
 
-## 贡献
+## 🤝 贡献
 
-欢迎提交 Issue 和 Pull Request 来完善这个框架!
+欢迎提交 Issue 分享你的 TCREI 实践案例，或者提交 PR 改进交互体验。
 
-## 许可证
+## 📄 许可证
 
 MIT License
-
-## 联系方式
-
-如有问题或建议,欢迎通过 GitHub Issues 联系。
-
----
-
-**让提示词工程更系统化、更高效!** 🚀
