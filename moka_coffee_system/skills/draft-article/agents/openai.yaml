@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: Draft Article
+  short_description: 基于已确认主题和写前包生成墨咖公众号正文初稿
+  default_prompt: 基于已确认的主题和写前包，为墨咖 MoKa 写一版自然、可读、适合公众号的正文初稿，不要跳过墨咖既有文风约束。
