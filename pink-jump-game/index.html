@@ -13,7 +13,7 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
 .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10}
 .overlay.show{display:flex}
 
-#startScreen{background:rgba(255,210,220,0.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#startScreen{background:rgba(255,210,220,0.82)}
 #startScreen .title{font-family:monospace;font-size:clamp(22px,5vw,34px);font-weight:900;color:#C03050;text-shadow:2px 2px 0 rgba(200,48,80,0.2);margin-bottom:4px;letter-spacing:3px;animation:titleBob 1.5s ease-in-out infinite}
 @keyframes titleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 #startScreen .subtitle{font-family:monospace;font-size:11px;color:#E04070;margin-bottom:14px;letter-spacing:3px;opacity:0.75}
@@ -25,7 +25,7 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
 .lv-btn.locked{background:#E0C0CC;border-color:#D0A0B0;color:#C0A0B0;cursor:not-allowed;box-shadow:3px 3px 0 #B090A0;font-size:18px}
 .lv-btn.locked:hover{transform:none;box-shadow:3px 3px 0 #B090A0;background:#E0C0CC}
 
-.pixel-btn{display:inline-block;padding:12px 36px;border:3px solid #FF6090;background:#FF4088;color:#FFF;font-family:monospace;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:2px;transition:all 0.1s;box-shadow:4px 4px 0 #801830;text-decoration:none}
+.pixel-btn{display:inline-block;padding:12px 36px;border:3px solid #FF6090;background:#FF4088;color:#FFF;font-family:monospace;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:2px;transition:all 0.1s;box-shadow:4px 4px 0 #801830;text-decoration:none;touch-action:manipulation}
 .pixel-btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 #801830;background:#FF6090}
 .pixel-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #801830}
 .pixel-btn.secondary{background:transparent;border-color:#FFB3C6;color:#C03050;box-shadow:4px 4px 0 rgba(200,48,80,0.2)}
@@ -44,6 +44,25 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
 .hint-restart{font-family:monospace;font-size:10px;color:#FF80AB;margin-top:10px;letter-spacing:1px;animation:hintBlink 1.5s steps(2) infinite}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:0.3}}
 .hint-text{font-family:monospace;font-size:11px;color:#C03050;margin-top:12px;letter-spacing:1px;opacity:0.7}
+.desktop-hint{display:block}.mobile-hint{display:none}
+@media(pointer:coarse){.desktop-hint{display:none}.mobile-hint{display:block}}
+
+/* Coin badge on start screen */
+#coinBadge{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:6px;z-index:20}
+#coinBadge canvas{width:28px;height:28px;image-rendering:pixelated}
+#coinCount{font-family:monospace;font-size:18px;font-weight:900;color:#C03050}
+#achHeartBtn{cursor:pointer;font-size:22px;margin-left:4px;transition:transform 0.2s}
+#achHeartBtn:hover{transform:scale(1.2)}
+#achPanel{display:none;position:absolute;inset:0;z-index:90;background:rgba(45,27,46,0.92);flex-direction:column;align-items:center;justify-content:center}
+#achPanel.show{display:flex}
+#achGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:360px}
+.ach-cell{width:100px;height:100px;border:3px solid #FF80AB;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:monospace;font-size:10px;color:#FFD0DD;text-align:center;gap:4px}
+.ach-cell.locked{background:#C0A0B0;border-color:#A08090;color:#907080}.ach-cell.locked .ach-icon{font-size:28px;opacity:0.5}
+.ach-cell.unlocked{background:#C03050;border-color:#801830;color:#FFD0DD}
+.ach-icon{font-size:24px}
+
+/* Level select screen */
+#levelScreen{background:rgba(255,210,220,0.85)}
 
 #winScreen{background:rgba(255,210,220,0.78)}
 .reward-row{margin-top:8px;font-family:monospace;font-size:13px;color:#E04070}
@@ -55,11 +74,23 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
   <canvas id="gameCanvas"></canvas>
 
   <div id="startScreen" class="overlay show">
+    <div id="coinBadge">
+      <canvas id="coinCanvas" width="28" height="28"></canvas>
+      <span id="coinCount">0</span>
+      <canvas id="achHeartCanvas" width="28" height="28" title="成就" style="width:28px;height:28px;image-rendering:pixelated;cursor:pointer;margin-left:10px;transition:transform 0.15s;" onmouseenter="this.style.transform='scale(1.25)'" onmouseleave="this.style.transform='scale(1)'"></canvas>
+    </div>
     <div class="title">PINK JUMP</div>
-    <div class="subtitle">~ 选择关卡 ~</div>
-    <div class="level-grid" id="levelGrid"></div>
+    <div class="subtitle">~ 粉白跳跃大冒险 ~</div>
     <button class="pixel-btn" id="btnStart">▶ 开始闯关</button>
-    <div class="hint-text">[ SPACE / CLICK ] 跳跃 ｜ [ ↓ / S ] 蹲下 ｜ [ SHIFT ] 攻击</div>
+    <div class="hint-text desktop-hint">[ SPACE / CLICK ] 跳跃 ｜ [ ↓ / S ] 蹲下 ｜ [ SHIFT ] 攻击</div>
+    <div class="hint-text mobile-hint">👆 上滑跳跃 ｜ 再次上滑二段跳 ｜ Boss 自动射击</div>
+  </div>
+
+  <div id="levelScreen" class="overlay">
+    <div class="title" style="font-size:28px">选择关卡</div>
+    <div class="level-grid" id="levelGrid"></div>
+    <button class="pixel-btn secondary" id="btnBackToMenu">↩ 返回</button>
+    <div class="hint-text">点击关卡开始挑战</div>
   </div>
 
   <div id="gameOverScreen" class="overlay">
@@ -77,6 +108,10 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
     </div>
   </div>
 
+  <div id="achieveBox" style="display:flex;position:absolute;bottom:16px;right:-300px;z-index:100;width:220px;height:48px;background:#C03050;border:2px solid #801830;font-family:monospace;align-items:center;gap:10px;padding:0 10px;box-sizing:border-box;">
+    <canvas id="achieveSkull" width="30" height="30" style="width:30px;height:30px;image-rendering:pixelated;flex-shrink:0;"></canvas>
+    <span style="color:#FFD0DD;font-size:14px;font-weight:bold;white-space:nowrap;">都说事不过三！</span>
+  </div>
   <div id="winScreen" class="overlay">
     <div class="card">
       <div class="go-emoji">🎉</div>
@@ -89,17 +124,27 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;image-rendering:p
       </div>
     </div>
   </div>
+
+  <div id="achPanel">
+    <div class="title" style="color:#FFD0DD;margin-bottom:16px;">🏆 成 就</div>
+    <div id="achGrid"></div>
+    <button class="pixel-btn secondary" id="btnCloseAch" style="margin-top:16px;color:#FFD0DD;border-color:#FF80AB;">关闭</button>
+  </div>
 </div>
 
 <script>
 (function(){
 'use strict';
 
+// ── Device detection ──
+var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 // ── DOM refs ──
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const container = document.getElementById('gameContainer');
 const startScreen = document.getElementById('startScreen');
+const levelScreen = document.getElementById('levelScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const winScreen = document.getElementById('winScreen');
 const finalScoreEl = document.getElementById('finalScore');
@@ -112,7 +157,13 @@ const btnRestart = document.getElementById('btnRestart');
 const btnMenu = document.getElementById('btnMenu');
 const btnWinMenu = document.getElementById('btnWinMenu');
 const btnNext = document.getElementById('btnNext');
+const btnBackToMenu = document.getElementById('btnBackToMenu');
 const levelGrid = document.getElementById('levelGrid');
+const coinCanvas = document.getElementById('coinCanvas');
+const coinCountEl = document.getElementById('coinCount');
+const coinCtx = coinCanvas.getContext('2d');
+coinCanvas.width = 28; coinCanvas.height = 28;
+coinCtx.imageSmoothingEnabled = false;
 
 // ── Canvas setup ──
 const GW = 640, GH = 360;
@@ -156,14 +207,132 @@ function sfxWin() {
   setTimeout(function(){ beep(1000,0.08,'square',0.05); },120); setTimeout(function(){ beep(1200,0.1,'square',0.06); },180);
 }
 
+// ── BGM (chiptune — 3 modes) ──
+var bgmPlaying = false, bgmInterval = null, bgmMode = 'normal';
+var bgmNormal = [
+  {n:523,d:0.3},{n:659,d:0.3},{n:784,d:0.4},{n:0,d:0.15},
+  {n:784,d:0.25},{n:659,d:0.25},{n:523,d:0.5},{n:0,d:0.2},
+  {n:440,d:0.3},{n:523,d:0.3},{n:659,d:0.4},{n:0,d:0.15},
+  {n:587,d:0.25},{n:523,d:0.25},{n:440,d:0.5},{n:0,d:0.2},
+  {n:523,d:0.3},{n:440,d:0.3},{n:392,d:0.4},{n:0,d:0.15},
+  {n:440,d:0.25},{n:523,d:0.25},{n:659,d:0.5},{n:0,d:0.2},
+  {n:784,d:0.3},{n:659,d:0.3},{n:523,d:0.4},{n:0,d:0.15},
+  {n:440,d:0.25},{n:523,d:0.25},{n:392,d:0.5},{n:0,d:0.3},
+];
+var bgmBoss = [
+  {n:784,d:0.12},{n:988,d:0.12},{n:1175,d:0.12},{n:784,d:0.1},
+  {n:988,d:0.1},{n:1175,d:0.1},{n:1319,d:0.15},{n:0,d:0.08},
+  {n:1568,d:0.08},{n:1319,d:0.08},{n:1175,d:0.1},{n:988,d:0.1},
+  {n:784,d:0.12},{n:988,d:0.12},{n:1175,d:0.12},{n:0,d:0.08},
+  {n:880,d:0.1},{n:1047,d:0.1},{n:1319,d:0.12},{n:0,d:0.08},
+  {n:1568,d:0.08},{n:1319,d:0.08},{n:1047,d:0.1},{n:880,d:0.12},
+  {n:784,d:0.08},{n:988,d:0.08},{n:1175,d:0.08},{n:1319,d:0.08},
+  {n:1568,d:0.15},{n:1175,d:0.1},{n:784,d:0.2},{n:0,d:0.15},
+];
+var bgmChill = [
+  {n:523,d:0.5},{n:659,d:0.4},{n:0,d:0.2},{n:784,d:0.6},{n:0,d:0.3},
+  {n:659,d:0.4},{n:523,d:0.5},{n:0,d:0.2},{n:440,d:0.4},{n:523,d:0.6},{n:0,d:0.3},
+  {n:392,d:0.5},{n:440,d:0.4},{n:0,d:0.2},{n:523,d:0.6},{n:0,d:0.3},
+  {n:440,d:0.4},{n:392,d:0.5},{n:0,d:0.2},{n:330,d:0.6},{n:0,d:0.4},
+];
+var bgmNoteIdx = 0;
+function playBGM(mode) {
+  if (!audioCtx) return;
+  stopBGM(); // kill previous before switching
+  bgmPlaying = true;
+  bgmMode = mode || 'normal';
+  bgmNoteIdx = 0;
+  function playNote() {
+    if (!bgmPlaying) return;
+    var melody = bgmMode === 'boss' ? bgmBoss : (bgmMode === 'chill' ? bgmChill : bgmNormal);
+    var note = melody[bgmNoteIdx % melody.length];
+    if (note.n > 0) {
+      var vol = bgmMode === 'boss' ? 0.04 : 0.02;
+      var wave = bgmMode === 'boss' ? 'sawtooth' : 'triangle';
+      beep(note.n, note.d*0.4, wave, vol);
+      if (bgmMode === 'boss') {
+        // Intense: fast arpeggio + bass drum feel
+        setTimeout(function() { beep(note.n*1.25, note.d*0.3, 'square', 0.025); }, 40);
+        setTimeout(function() { beep(note.n*0.75, note.d*0.2, 'square', 0.015); }, 80);
+      } else if (bgmMode === 'chill') {
+        setTimeout(function() { beep(note.n*0.5, note.d*0.6, 'sine', 0.012); }, 80);
+      } else {
+        setTimeout(function() { beep(note.n*0.5, note.d*0.4, 'triangle', 0.012); }, 30);
+      }
+    }
+    bgmNoteIdx++;
+    var gap = note.d * 1000;
+    if (bgmMode === 'boss') gap *= 0.55; // much faster
+    bgmInterval = setTimeout(playNote, gap);
+  }
+  playNote();
+}
+function stopBGM() { bgmPlaying = false; if (bgmInterval) clearTimeout(bgmInterval); }
+
 // ── Game state ──
-var STATE = { IDLE: 'idle', PLAYING: 'playing', BOSS_INTRO: 'bossIntro', BOSS: 'boss', OVER: 'over' };
+var STATE = { IDLE: 'idle', PLAYING: 'playing', BOSS_INTRO: 'bossIntro', BOSS: 'boss', OVER: 'over', TUTORIAL: 'tutorial', TUTORIAL_PLAY: 'tplay' };
 var gameState = STATE.IDLE;
 var currentLevel = 1;
 var obstaclesPassed = 0;
 var obstaclesNeeded = 40;
 var totalCoins = parseInt(localStorage.getItem('pjCoins')||'0',10);
-var unlockedLevel = parseInt(localStorage.getItem('pjUnlocked')||'1',10);
+var unlockedLevel = parseInt(localStorage.getItem('pjUnlocked')||'0',10);
+var playerLives = 2;
+var invincibleTimer = 0;
+// Achievement: die 3 times on same level
+var levelDeaths = 0, lastAttemptedLevel = -1;
+var achievementShown = false;
+// ── Achievements ──
+var achUnlocked = (localStorage.getItem('pjAch')||'').split(',').filter(Boolean).map(Number);
+var achDefs = [
+  {id:1,name:'都说事不过三',icon:'💀',desc:'同一关失败3次'},
+  {id:2,name:'教程毕业',icon:'🎓',desc:'完成st1/st2/st3'},
+  {id:3,name:'初入江湖',icon:'⚔️',desc:'通关第1关'},
+  {id:4,name:'跳跳高手',icon:'⭐',desc:'通关第3关'},
+  {id:5,name:'半程英雄',icon:'🛡️',desc:'通关第5关'},
+  {id:6,name:'昆虫猎人',icon:'🦋',desc:'击败5个Boss'},
+  {id:7,name:'富翁来了',icon:'💰',desc:'收集200粉色币'},
+  {id:8,name:'接近顶峰',icon:'🏔️',desc:'通关第8关'},
+  {id:9,name:'终极赢家',icon:'👑',desc:'通关第10关'},
+];
+function unlockAch(id) {
+  if (achUnlocked.indexOf(id) >= 0) return;
+  achUnlocked.push(id);
+  localStorage.setItem('pjAch', achUnlocked.join(','));
+  achieveNotify = 600;
+}
+// Check achievements after level/tutorial completion
+function checkAchs() {
+  if (unlockedLevel > 1) unlockAch(3); // level 1 done
+  if (unlockedLevel > 3) unlockAch(4); // level 3 done
+  if (unlockedLevel > 5) unlockAch(5); // level 5 done
+  if (unlockedLevel > 8) unlockAch(8); // level 8 done
+  if (unlockedLevel > 10) unlockAch(9); // level 10 done
+  if (totalCoins >= 200) unlockAch(7);
+}
+var bossKillCount = parseInt(localStorage.getItem('pjBossKills')||'0',10);
+function addBossKill() {
+  bossKillCount++;
+  localStorage.setItem('pjBossKills', bossKillCount);
+  if (bossKillCount >= 5) unlockAch(6);
+}
+var achieveNotify = 0; // animation timer
+
+// ── Tutorial ──
+var tStage = 0; var tPhase = 0;
+var tDialogue = []; var tCharIdx = 0; var tCharTimer = 0;
+var tFairyX = 0, tFairyY = 0, tFairyAnim = 0;
+var tutorialBossHP = 30;
+var tBossShootTimer = 0;
+
+var tDialogues = [
+  [['欢迎游玩此游戏'],['接下来是该游戏教程，我是向导，叫yan'],['按下空格，即可跳跃尖刺和箱子障碍'],['对了，悄悄告诉你，连按两下空格，可以二段跳！']],
+  [['真棒！接下来是下蹲教学'],['按键盘右下角的向下按键，即可躲避栅栏，低空飞行的鸟']],
+  [['真棒！我告诉你，我们这个世界有一些难缠的家伙，接下来是打怪教程'],['准备迎战！']]
+];
+var tWinMsg = ['你已经领略了这个世界的生存方向，带着我的希望开始闯关吧！'];
+
+function setTDialogue(lines) { tDialogue = lines; tCharIdx = 0; tCharTimer = 0; }
 function saveUnlock(lv) { if (lv > unlockedLevel) { unlockedLevel = lv; localStorage.setItem('pjUnlocked', lv); } }
 function saveCoins() { localStorage.setItem('pjCoins', totalCoins); }
 
@@ -208,6 +377,8 @@ var player = {
     this.eyeBlink--; if (this.eyeBlink <= 0) this.eyeBlink = 90 + Math.random() * 180;
   },
   draw: function() {
+    // Invincibility flash
+    if (invincibleTimer > 0 && Math.floor(invincibleTimer/4) % 2 === 0) return;
     var cx = Math.floor(this.x), cy = Math.floor(this.y), r = this.r;
     var sx = 1 + this.squishT * 0.3, sy = 1 - this.squishT * 0.3;
     ctx.save(); ctx.translate(cx, cy); ctx.scale(sx, sy);
@@ -340,6 +511,20 @@ function drawBarrier(o) { var x=o.x,y=o.y,w=o.w,h=o.h;
 
 function getSpeed() { return 5 + currentLevel*0.4 + Math.min(obstaclesPassed*0.008, 3); }
 
+function hitPlayer(dmg) {
+  if (invincibleTimer > 0) return;
+  if (playerLives <= 0) {
+    // Hearts already gone → game over
+    playerLives = 0;
+    gameOver();
+    return;
+  }
+  // Still have hearts → deduct
+  playerLives = Math.max(0, playerLives - dmg);
+  invincibleTimer = 60;
+  sfxHit(); triggerShake();
+}
+
 function updateObstacles() {
   var spd = getSpeed();
   obstTimer++;
@@ -387,13 +572,14 @@ function startBoss() {
   gameState = STATE.BOSS_INTRO;
   bossActive = true; bossFought = true;
   bossType = (currentLevel-3) % 4;
-  bossMaxHP = 8 + currentLevel*2;
+  bossMaxHP = 30 + (currentLevel-3)*15;
   bossHP = bossMaxHP;
   bossX = W - 100; bossY = GROUND_Y - bossH;
   bossProjectiles = []; playerProjectiles = [];
   bossTimer = 0; bossShootTimer = 0;
   vsTimer = 50;
   obstacles.length = 0; obstTimer = 0;
+  playBGM('boss');
 }
 
 function updateBossIntro() {
@@ -405,12 +591,49 @@ function updateBoss() {
   bossTimer++;
   bossY = GROUND_Y - bossH + Math.sin(bossTimer*0.03)*20;
 
-  // Boss shoots
+  // Boss shooting interval: faster from level 5
+  var shootInterval = 60; // base 1s
+  if (currentLevel >= 5) shootInterval = Math.max(15, 60 - (currentLevel-4)*8);
+  var isSpread = currentLevel >= 5;
+
   bossShootTimer++;
-  var si = Math.max(25, 60-currentLevel*3);
-  if (bossShootTimer >= si) {
+  if (bossShootTimer >= shootInterval) {
     bossShootTimer = 0;
-    bossProjectiles.push({ x: bossX-10, y: bossY+bossH/2, vx: -3-Math.random(), vy: (Math.random()-0.5)*2, r: 4, life: 200 });
+    var dx = player.x - bossX;
+    var dy = player.y - bossY;
+    var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    var spd = isSpread ? 5 : 4;
+
+    if (isSpread) {
+      // Spread: 3 shots (up, center, down) — center aimed directly at player
+      var baseAngle = Math.atan2(dy, dx);
+      var spreadAngle = 0.18; // tight spread to ensure hits
+      for (var a = -1; a <= 1; a++) {
+        var angle = baseAngle + a * spreadAngle;
+        var vx = Math.cos(angle)*spd;
+        var vy = Math.sin(angle)*spd;
+        // Lead the target: aim at where player will be
+        var travelTime = dist / spd;
+        var leadY = player.vy * travelTime * 0.5;
+        var leadAngle = Math.atan2(dy + leadY, dx) + a * spreadAngle;
+        bossProjectiles.push({
+          x: bossX - 10, y: bossY + bossH/2,
+          vx: Math.cos(leadAngle)*spd, vy: Math.sin(leadAngle)*spd,
+          r: 5, life: 200
+        });
+      }
+    } else {
+      // Single aimed shot with slight lead
+      var travelTime = dist / spd;
+      var leadY = player.vy * travelTime * 0.3;
+      var aimDx = dx, aimDy = dy + leadY;
+      var aimDist = Math.sqrt(aimDx*aimDx + aimDy*aimDy) || 1;
+      bossProjectiles.push({
+        x: bossX - 10, y: bossY + bossH/2,
+        vx: (aimDx/aimDist)*spd, vy: (aimDy/aimDist)*spd,
+        r: 5, life: 250
+      });
+    }
   }
 
   // Update boss projectiles - check player hit
@@ -420,7 +643,9 @@ function updateBoss() {
     if (p.x < -20 || p.life <= 0) { bossProjectiles.splice(i,1); continue; }
     var pb = player.getBounds();
     if (p.x-p.r < pb.right && p.x+p.r > pb.left && p.y-p.r < pb.bottom && p.y+p.r > pb.top) {
-      gameOver(); return;
+      bossProjectiles.splice(i,1);
+      hitPlayer(1); // boss hit = half heart
+      continue;
     }
   }
 
@@ -430,48 +655,142 @@ function updateBoss() {
     p.x += p.vx; p.y += p.vy; p.life--;
     if (p.x > W+20 || p.life <= 0) { playerProjectiles.splice(i,1); continue; }
     if (p.x+p.r > bossX && p.x-p.r < bossX+bossW && p.y+p.r > bossY && p.y-p.r < bossY+bossH) {
-      bossHP--; playerProjectiles.splice(i,1); sfxBossHit();
+      var playerDmg = 1 + (currentLevel-3)*2;
+      bossHP -= playerDmg; playerProjectiles.splice(i,1); sfxBossHit();
       if (bossHP <= 0) { bossDefeated(); return; }
     }
   }
 }
 
 function bossDefeated() {
+  addBossKill();
   sfxWin();
   bossActive = false;
   bossProjectiles = []; playerProjectiles = [];
   gameState = STATE.PLAYING;
   obstTimer = 0;
+  playBGM('chill');
 }
 
 var shiftHeld = false;
 function playerShoot() {
-  if (gameState !== STATE.BOSS) return;
+  if (gameState !== STATE.BOSS && gameState !== STATE.TUTORIAL_PLAY) return;
   initAudio(); sfxShoot();
   playerProjectiles.push({ x: player.x+player.r, y: player.y-4, vx: 6, vy: 0, r: 3, life: 100 });
 }
-setInterval(function() { if (shiftHeld) playerShoot(); }, 150);
+setInterval(function() {
+  if (shiftHeld) playerShoot();
+  if (isMobile && (gameState === STATE.BOSS || gameState === STATE.TUTORIAL_PLAY)) playerShoot();
+}, 150);
 
 function drawBoss() {
-  var bx = bossX, by = bossY, bw = bossW, bh = bossH;
-  var tc = [
-    { body: '#FF80AB', wing: '#FFB3C6', accent: '#FF4088' },
-    { body: '#FFB347', wing: '#FFD080', accent: '#CC8800' },
-    { body: '#FF6090', wing: '#FF88A5', accent: '#C03050' },
-    { body: '#B088FF', wing: '#D0C0FF', accent: '#8050D0' }
-  ][bossType];
-  var wingFlap = Math.sin(bossTimer*0.15)*12;
-  FR(bx+bw/2-20, by-wingFlap, 18, 28, tc.wing);
-  FR(bx+bw/2+2, by+wingFlap, 18, 28, tc.wing);
-  FR(bx+15, by+10, bw-30, bh-15, tc.body);
-  FR(bx+20, by+12, bw-40, bh-20, tc.accent);
-  FR(bx+25, by+14, 10, 10, '#FFF'); FR(bx+27, by+16, 4, 4, '#2D1B2E');
-  FR(bx+bw-35, by+14, 10, 10, '#FFF'); FR(bx+bw-33, by+16, 4, 4, '#2D1B2E');
-  FR(bx+18, by+5, 2, 8, tc.accent); FR(bx+bw-20, by+5, 2, 8, tc.accent);
-  FR(bx+14, by+2, 6, 4, tc.accent); FR(bx+bw-20, by+2, 6, 4, tc.accent);
+  var bx = bossX, by = bossY, bw = 70, bh = 56;
   var names = ['巨蝶','巨蜂','甲虫','蜻蜓'];
+  // Wing flap: 0=up, 1=down, smooth sin wave
+  var flapCycle = Math.sin(bossTimer*0.18);
+  var flapDown = Math.max(0, flapCycle); // 0→1→0 for downstroke
+  var flapUp = Math.max(0, -flapCycle); // 0→1→0 for upstroke
+  var wingScale = 1 + flapDown * 0.4; // wings expand on downstroke
+
+  if (bossType === 0) {
+    // === BUTTERFLY: large patterned wings ===
+    FR(bx+28, by+12, 14, bh-20, '#554030');
+    FR(bx+30, by+14, 10, bh-24, '#6B5040');
+    // Upper wings — scale width to simulate flap
+    var uwL = Math.floor(26 * wingScale), uwR = Math.floor(26 * wingScale);
+    var uwy = by + 8 - Math.floor(flapDown * 14); // rise on downstroke
+    FR(bx+28-uwL, uwy, uwL, 22, '#FF8833'); FR(bx+30-uwL+2, uwy+2, uwL-4, 18, '#FFAA55');
+    FR(bx+42, uwy, uwR, 22, '#FF8833'); FR(bx+42, uwy+2, uwR-4, 18, '#FFAA55');
+    FR(bx+10, uwy+6, 6, 6, '#332010'); FR(bx+54, uwy+6, 6, 6, '#332010');
+    // Lower wings
+    var lw = Math.floor(20 * wingScale);
+    var lwy = by + 30 - Math.floor(flapDown * 8);
+    FR(bx+28-lw+2, lwy, lw, 14, '#FF7733'); FR(bx+30-lw+4, lwy+2, lw-4, 10, '#FF9955');
+    FR(bx+42, lwy, lw, 14, '#FF7733'); FR(bx+42, lwy+2, lw-4, 10, '#FF9955');
+    // Antennae
+    FR(bx+30, by, 2, 10, '#332010'); FR(bx+38, by, 2, 10, '#332010');
+    FR(bx+28, by-4, 5, 3, '#332010'); FR(bx+37, by-4, 5, 3, '#332010');
+    // Eyes
+    FR(bx+28, by+16, 6, 5, '#FF4444'); FR(bx+36, by+16, 6, 5, '#FF4444');
+    FR(bx+29, by+17, 2, 2, '#FFF'); FR(bx+37, by+17, 2, 2, '#FFF');
+  } else if (bossType === 1) {
+    // === BEE: chubby striped body, fast buzzing wings ===
+    FR(bx+24, by+10, 22, bh-16, '#332010');
+    FR(bx+24, by+14, 22, 4, '#FFCC00'); FR(bx+24, by+22, 22, 4, '#FFCC00');
+    FR(bx+24, by+30, 22, 4, '#FFCC00'); FR(bx+24, by+38, 22, 4, '#FFCC00');
+    // Fast tiny wings — blur effect via multiple overlapped wings
+    var wy = by + 2;
+    for (var f = 0; f < 3; f++) {
+      var fa = 0.15 + f*0.05;
+      var fy = wy + Math.sin(bossTimer*0.4 + f)*6;
+      var fw = 12 + f*4;
+      ctx.globalAlpha = fa;
+      FR(bx+10, fy, fw, 10, 'rgba(200,220,255,0.5)');
+      FR(bx+48-fw, fy, fw, 10, 'rgba(200,220,255,0.5)');
+    }
+    ctx.globalAlpha = 1;
+    // Eyes
+    FR(bx+24, by+12, 4, 5, '#000'); FR(bx+42, by+12, 4, 5, '#000');
+    FR(bx+25, by+13, 1, 2, '#FFF'); FR(bx+43, by+13, 1, 2, '#FFF');
+    // Stinger
+    FR(bx+32, by+bh-4, 6, 4, '#332010'); FR(bx+33, by+bh, 4, 3, '#FFCC00');
+    // Antennae
+    FR(bx+28, by, 2, 8, '#332010'); FR(bx+40, by, 2, 8, '#332010');
+  } else if (bossType === 2) {
+    // === BEETLE: hard shell opens to reveal wings ===
+    // Wing covers (elytra) — open on downstroke
+    var elytraOpen = flapDown * 20;
+    FR(bx+12-elytraOpen*0.3, by+8, bw/2-16+elytraOpen*0.3, bh-12, '#442818');
+    FR(bx+bw/2+2, by+8, bw/2-16+elytraOpen*0.3, bh-12, '#442818');
+    // Inner wings flash when covers open
+    if (flapDown > 0.3) {
+      ctx.globalAlpha = flapDown * 0.5;
+      FR(bx+14, by+10, bw-28, 8, 'rgba(200,220,255,0.6)');
+      ctx.globalAlpha = 1;
+    }
+    // Body
+    FR(bx+28, by+14, 14, bh-20, '#332010');
+    // Shine
+    FR(bx+18, by+12, 8, 5, '#7A4A30'); FR(bx+44, by+12, 8, 5, '#7A4A30');
+    // Pincers
+    FR(bx+4, by+16, 10, 4, '#332010'); FR(bx+56, by+16, 10, 4, '#332010');
+    FR(bx+2, by+12, 6, 5, '#332010'); FR(bx+62, by+12, 6, 5, '#332010');
+    // 6 Legs
+    for (var l = 0; l < 3; l++) {
+      FR(bx+8, by+22+l*8, 10, 3, '#332010'); FR(bx+52, by+22+l*8, 10, 3, '#332010');
+    }
+    // Eyes
+    FR(bx+20, by+12, 5, 4, '#FF6600'); FR(bx+45, by+12, 5, 4, '#FF6600');
+    // Antennae
+    FR(bx+18, by-2, 3, 10, '#332010'); FR(bx+16, by-6, 6, 2, '#332010');
+    FR(bx+48, by-2, 3, 10, '#332010'); FR(bx+46, by-6, 6, 2, '#332010');
+  } else {
+    // === DRAGONFLY: 4 narrow wings, fast alternating flap ===
+    FR(bx+30, by+6, 10, bh-8, '#4488AA');
+    FR(bx+31, by+8, 8, bh-12, '#55AACC');
+    for (var s = 0; s < 5; s++) FR(bx+31, by+12+s*8, 8, 2, '#337799');
+    // 4 wings with multi-frame motion blur
+    for (var f = 0; f < 2; f++) {
+      var fa = 0.2 + f*0.06;
+      var fy = by + 4 + Math.sin(bossTimer*0.35 + f*1.5)*7;
+      var fw = Math.floor(24 * (0.7 + flapDown*0.6));
+      ctx.globalAlpha = fa;
+      FR(bx+10, fy, fw, 6, 'rgba(180,220,255,0.6)');
+      FR(bx+36, fy-2, fw, 6, 'rgba(180,220,255,0.6)');
+      FR(bx+12, fy+14, fw, 6, 'rgba(180,220,255,0.6)');
+      FR(bx+38, fy+12, fw, 6, 'rgba(180,220,255,0.6)');
+    }
+    ctx.globalAlpha = 1;
+    // Eyes
+    FR(bx+24, by+8, 10, 8, '#FF4444'); FR(bx+26, by+10, 6, 4, '#FF8888');
+    FR(bx+36, by+8, 10, 8, '#FF4444'); FR(bx+38, by+10, 6, 4, '#FF8888');
+    FR(bx+27, by+9, 2, 2, '#FFF'); FR(bx+37, by+9, 2, 2, '#FFF');
+    // Tail
+    FR(bx+33, by+bh-2, 4, 8, '#337799');
+  }
+
   ctx.fillStyle='#C03050'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
-  ctx.fillText(names[bossType], bx+bw/2, by-8);
+  ctx.fillText(names[bossType], bx+bw/2, by-10);
   ctx.textAlign='start';
 }
 
@@ -557,16 +876,80 @@ function drawBackground() {
   for (var px = dashOff; px < W; px += 24) FR(px, GROUND_Y+3, 14, 1, 'rgba(255,255,255,0.35)');
 }
 
+function drawHeartCoin(x, y, s) {
+  // Pink coin body
+  FR(x-s, y-s, s*2, s*2, '#FF80AB');
+  FR(x-s+1, y-s+1, s*2-2, s*2-2, '#FFB3C6');
+  FR(x-s+2, y-s+2, s*2-4, s*2-4, '#FFD0DD');
+  // Small heart in center
+  FR(x-2, y-2, 2, 1, '#FF4088'); FR(x+1, y-2, 2, 1, '#FF4088');
+  FR(x-3, y-1, 6, 1, '#FF4088');
+  FR(x-4, y, 8, 1, '#FF4088');
+  FR(x-3, y+1, 6, 1, '#FF4088');
+  FR(x-2, y+2, 2, 1, '#FF4088'); FR(x+1, y+2, 2, 1, '#FF4088');
+  FR(x-1, y+3, 3, 1, '#FF4088');
+}
+
 function drawScoreUI() {
-  var bx = 12, by = 10, bw = 140, bh = 32;
-  FR(bx, by, bw, bh, '#3D2035'); FR(bx+1, by+1, bw-2, bh-2, 'rgba(255,255,255,0.92)');
-  ctx.strokeStyle = '#FF6090'; ctx.lineWidth = 2;
-  ctx.strokeRect(bx+0.5, by+0.5, bw, bh);
-  ctx.fillStyle = '#C03050'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
-  ctx.fillText('Lv'+currentLevel+'  '+obstaclesPassed+'/'+obstaclesNeeded, bx+bw/2, by+16);
-  ctx.fillStyle = '#FF80AB'; ctx.font = '8px monospace';
-  ctx.fillText('🪙 '+totalCoins, bx+bw/2, by+28);
-  ctx.textAlign = 'start';
+  var isTutorial = (gameState === STATE.TUTORIAL || gameState === STATE.TUTORIAL_PLAY);
+  if (!isTutorial) {
+    var bx = 12, by = 10, bw = 130, bh = 28;
+    FR(bx, by, bw, bh, '#3D2035'); FR(bx+1, by+1, bw-2, bh-2, 'rgba(255,255,255,0.92)');
+    ctx.strokeStyle = '#FF6090'; ctx.lineWidth = 2;
+    ctx.strokeRect(bx+0.5, by+0.5, bw, bh);
+    ctx.fillStyle = '#C03050'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('Lv'+currentLevel+' '+obstaclesPassed+'/'+obstaclesNeeded, bx+bw/2, by+17);
+    ctx.textAlign = 'start';
+    drawHeartLives();
+  }
+}
+
+function drawHeartLives() {
+  var hx = W - 30, hy = 20, hs = 14;
+  for (var h = 0; h < 2; h++) {
+    var px = hx - h * 36;
+    if (playerLives > h) {
+      drawPixelHeart(px, hy, hs, '#FF4088', '#FF6090');
+    } else {
+      drawPixelHeart(px, hy, hs, '#D0A0B0', '#E0C0D0');
+    }
+  }
+  // Flash hearts when lives = 0 (last chance!)
+  if (playerLives <= 0 && Math.floor(Date.now()/400)%2 === 0) {
+    for (var h = 0; h < 2; h++) {
+      drawPixelHeart(hx - h*36, hy, hs, '#FF0000', '#FF4444');
+    }
+  }
+}
+
+function drawPixelHeart(x, y, s, c1, c2) {
+  // Heart shape: wider at top, point at bottom
+  var hd = [
+    [0,1,0,0,1,0],
+    [1,1,1,1,1,1],
+    [1,1,1,1,1,1],
+    [0,1,1,1,1,0],
+    [0,0,1,1,0,0],
+    [0,0,0,1,0,0],
+  ];
+  var ps = Math.max(1, Math.floor(s / 6)); // pixel size based on heart scale
+  // Scale and draw
+  for (var py = 0; py < hd.length; py++) {
+    for (var px = 0; px < hd[0].length; px++) {
+      if (hd[py][px]) {
+        var dx = x + px*ps - Math.floor(hd[0].length*ps/2);
+        var dy = y + py*ps - hd.length*ps + ps;
+        FR(dx, dy, ps, ps, c2);
+        // Border pixels
+        var isEdge = false;
+        if (py > 0 && !hd[py-1][px]) isEdge = true;
+        if (py < hd.length-1 && !hd[py+1][px]) isEdge = true;
+        if (px > 0 && !hd[py][px-1]) isEdge = true;
+        if (px < hd[0].length-1 && !hd[py][px+1]) isEdge = true;
+        if (isEdge) FR(dx, dy, ps, ps, c1);
+      }
+    }
+  }
 }
 
 function drawPixelDoor(x, y, w, h) {
@@ -654,7 +1037,10 @@ function renderFrame() {
   for (var i = 0; i < obstacles.length; i++) obstacles[i].draw(obstacles[i]);
   for (var i = 0; i < bossProjectiles.length; i++) {
     var p = bossProjectiles[i];
-    FR(p.x-p.r, p.y-p.r, p.r*2, p.r*2, '#FFD0DD'); FR(p.x-p.r+1, p.y-p.r+1, p.r*2-2, p.r*2-2, '#FFB3C6');
+    // Blue + white gradient orb
+    FR(p.x-p.r, p.y-p.r, p.r*2, p.r*2, '#4488FF');
+    FR(p.x-p.r+1, p.y-p.r+1, p.r*2-2, p.r*2-2, '#66AAFF');
+    FR(p.x-2, p.y-2, 4, 4, '#FFFFFF');
   }
   for (var i = 0; i < playerProjectiles.length; i++) {
     var p = playerProjectiles[i];
@@ -664,14 +1050,84 @@ function renderFrame() {
   if (bossActive) drawBoss();
   if (gameState === STATE.BOSS_INTRO) drawVS();
   if (gameState === STATE.BOSS) drawBossBar();
-  drawScoreUI(); ctx.restore();
+  drawScoreUI();
+  if (isMobile && (gameState === STATE.PLAYING || gameState === STATE.BOSS)) drawMobileHint();
+  if (achieveNotify > 0) drawAchievement();
+  ctx.restore();
+}
+
+function drawMobileHint() {
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = '8px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('上滑跳跃  |  再滑二段跳', W/2, H-8);
+  ctx.textAlign = 'start';
+}
+
+var achieveBox = document.getElementById('achieveBox');
+var achieveSkullCtx = document.getElementById('achieveSkull').getContext('2d');
+var achieveAnimFrame = null;
+function drawAchievement() {
+  if (achieveNotify <= 0) {
+    if (parseInt(achieveBox.style.right) < -200) return; // already hidden
+    achieveBox.style.right = '-300px';
+    return;
+  }
+  achieveNotify--;
+  if (achieveNotify > 560) {
+    var t = (600 - achieveNotify) / 40;
+    achieveBox.style.right = Math.floor(-220 + 236 * t) + 'px';
+  } else if (achieveNotify < 40) {
+    var t = (40 - achieveNotify) / 40;
+    achieveBox.style.right = Math.floor(16 - 316 * t) + 'px';
+  } else {
+    achieveBox.style.right = '16px';
+  }
+}
+
+function drawAchieveSkull() {
+  var cx = achieveSkullCtx;
+  cx.clearRect(0, 0, 30, 30);
+  // Skull
+  cx.fillStyle = '#FFD0DD';
+  cx.fillRect(8, 10, 6, 4); cx.fillRect(18, 10, 6, 4);
+  cx.fillRect(7, 14, 18, 2); cx.fillRect(9, 16, 14, 2);
+  cx.fillRect(10, 18, 4, 2); cx.fillRect(18, 18, 4, 2);
+  // Eyes
+  cx.fillStyle = '#801830';
+  cx.fillRect(10, 10, 3, 3); cx.fillRect(18, 10, 3, 3);
+  // Teeth
+  cx.fillStyle = '#FFB3C6';
+  cx.fillRect(12, 16, 2, 2); cx.fillRect(16, 16, 2, 2);
+  // Bow
+  cx.fillStyle = '#FF80AB';
+  cx.fillRect(6, 5, 5, 5); cx.fillRect(19, 5, 5, 5);
+  cx.fillStyle = '#FFB3C6';
+  cx.fillRect(7, 6, 3, 3); cx.fillRect(20, 6, 3, 3);
+  cx.fillStyle = '#FFD0DD';
+  cx.fillRect(12, 6, 6, 3);
+}
+drawAchieveSkull();
+
+function drawSkullBow(x, y) {
+  // Skull
+  FR(x-6, y-7, 12, 10, '#FFD0DD');
+  FR(x-5, y-6, 10, 8, '#FFF0F5');
+  // Eyes
+  FR(x-3, y-5, 3, 3, '#801830'); FR(x+2, y-5, 3, 3, '#801830');
+  // Teeth
+  FR(x-3, y+2, 2, 2, '#FFB3C6'); FR(x+2, y+2, 2, 2, '#FFB3C6');
+  // Bow
+  FR(x-8, y-11, 6, 4, '#FF80AB'); FR(x-7, y-10, 4, 2, '#FFB3C6');
+  FR(x+4, y-11, 6, 4, '#FF80AB'); FR(x+5, y-10, 4, 2, '#FFB3C6');
+  FR(x-1, y-9, 4, 3, '#FFD0DD');
 }
 
 // ── GAME LOOP ──
 var animId;
 
 function gameLoop() {
-  if (gameState === STATE.IDLE || gameState === STATE.OVER) return;
+  if (gameState === STATE.IDLE || gameState === STATE.OVER || gameState === STATE.TUTORIAL || gameState === STATE.TUTORIAL_PLAY) return;
 
   if (gameState === STATE.BOSS_INTRO) {
     updateBossIntro(); updateClouds();
@@ -683,6 +1139,7 @@ function gameLoop() {
   if (gameState === STATE.BOSS) {
     updateShake();
     player.update(); updateBoss(); updateClouds(); updateParticles();
+    if (invincibleTimer > 0) invincibleTimer--;
     renderFrame();
     animId = requestAnimationFrame(gameLoop);
     return;
@@ -694,8 +1151,9 @@ function gameLoop() {
   renderFrame();
 
   for (var i = 0; i < obstacles.length; i++) {
-    if (hitTest(player, obstacles[i])) { gameOver(); return; }
+    if (hitTest(player, obstacles[i])) { hitPlayer(1); break; }
   }
+  if (invincibleTimer > 0) invincibleTimer--;
   checkLevelProgress();
 
   animId = requestAnimationFrame(gameLoop);
@@ -705,18 +1163,23 @@ function idleLoop() {
   if (gameState !== STATE.IDLE) return;
   updateClouds();
   drawMenuScene();
+  if (achieveNotify > 0) drawAchievement();
   animId = requestAnimationFrame(idleLoop);
 }
 
 // ── FLOW ──
 function hideAllOverlays() {
   startScreen.classList.remove('show');
+  levelScreen.classList.remove('show');
   gameOverScreen.classList.remove('show');
   winScreen.classList.remove('show');
 }
 
 function startGame() {
+  lastWasTutorial = false;
   initAudio(); resize();
+  if (!bgmPlaying) playBGM('normal');
+  else playBGM('normal');
   player.reset();
   obstacles = []; particles = [];
   bossProjectiles = []; playerProjectiles = [];
@@ -724,6 +1187,7 @@ function startGame() {
   obstTimer = 0; obstInterval = 120;
   obstaclesNeeded = levelObstacles(currentLevel);
   bossActive = false; bossFought = false;
+  playerLives = 2; invincibleTimer = 0;
   shakeAmt = 0;
   gameState = STATE.PLAYING;
   hideAllOverlays();
@@ -732,6 +1196,16 @@ function startGame() {
 }
 
 function gameOver() {
+  // Track deaths for achievement
+  if (!achievementShown && currentLevel > 0) {
+    if (currentLevel === lastAttemptedLevel) { levelDeaths++; }
+    else { lastAttemptedLevel = currentLevel; levelDeaths = 1; }
+    if (levelDeaths >= 3) {
+      achievementShown = true;
+      unlockAch(1);
+      achieveNotify = -1;
+    }
+  }
   gameState = STATE.OVER;
   if (animId) cancelAnimationFrame(animId);
   sfxHit(); triggerShake();
@@ -755,23 +1229,38 @@ function levelWin() {
   if (animId) cancelAnimationFrame(animId);
   var reward = levelReward(currentLevel);
   totalCoins += reward; saveCoins();
+  coinCountEl.textContent = totalCoins;
   sfxWin();
   saveUnlock(currentLevel+1);
   winLevelEl.textContent = currentLevel;
   winRewardEl.textContent = reward;
   hideAllOverlays();
   winScreen.classList.add('show');
-  btnNext.style.display = (currentLevel >= 10) ? 'none' : 'inline-block';
+  btnWinMenu.style.display = 'inline-block';
+  btnWinMenu.textContent = '↩ 返回游戏界面';
+  btnNext.style.display = 'inline-block';
+  btnNext.textContent = (currentLevel >= 10) ? '▶ 完成' : '下一个 ▶';
+  hookAchs();
   buildLevelGrid();
 }
 
-function restartGame() { startGame(); }
+function restartGame() {
+  if (achieveNotify === -1) { achieveNotify = 600; }
+  if (lastWasTutorial) {
+    startTutorial(tStage);
+  } else {
+    startGame();
+  }
+}
 
 function goToMenu() {
+  if (achieveNotify === -1) { achieveNotify = 600; }
+  stopBGM();
   gameState = STATE.IDLE;
   obstaclesPassed = 0; score = 0;
   obstacles = []; particles = []; bossProjectiles = []; playerProjectiles = [];
   bossActive = false; shakeAmt = 0;
+  playerLives = 2; invincibleTimer = 0;
   player.reset(); obstTimer = 0; obstInterval = 120;
   hideAllOverlays();
   startScreen.classList.add('show');
@@ -783,6 +1272,22 @@ function goToMenu() {
 function buildLevelGrid() {
   if (!levelGrid) return;
   levelGrid.innerHTML = '';
+  // Tutorial levels: st1, st2, st3 (always unlocked)
+  for (var st = 0; st < 3; st++) {
+    var sbtn = document.createElement('div');
+    sbtn.className = 'lv-btn';
+    sbtn.textContent = 'st'+(st+1);
+    sbtn.style.background = '#FFD0DD'; sbtn.style.borderColor = '#FF80AB';
+    sbtn.style.boxShadow = '3px 3px 0 #C06080'; sbtn.style.fontSize = '13px';
+    (function(s) {
+      sbtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        startTutorial(s);
+      });
+    })(st);
+    levelGrid.appendChild(sbtn);
+  }
+  // Levels 1-10
   for (var lv = 1; lv <= 10; lv++) {
     var btn = document.createElement('div');
     btn.className = 'lv-btn';
@@ -795,7 +1300,7 @@ function buildLevelGrid() {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (l > unlockedLevel) return;
-        currentLevel = l; buildLevelGrid();
+        currentLevel = l; buildLevelGrid(); startGame();
       });
     })(lv);
     levelGrid.appendChild(btn);
@@ -803,7 +1308,11 @@ function buildLevelGrid() {
 }
 
 function nextLevel() {
-  if (currentLevel < 10) currentLevel++;
+  if (winLevelEl.textContent.indexOf('st') === 0) {
+    tutorialNext(); return;
+  }
+  if (currentLevel >= 10) { goToMenu(); return; }
+  currentLevel++;
   buildLevelGrid();
   startGame();
 }
@@ -811,12 +1320,18 @@ function nextLevel() {
 // ── INPUT ──
 function doJump() {
   if (gameState === STATE.IDLE) { startGame(); }
-  else if (gameState === STATE.PLAYING || gameState === STATE.BOSS) {
+  else if (gameState === STATE.PLAYING || gameState === STATE.BOSS || gameState === STATE.TUTORIAL_PLAY) {
     if (player.jump()) emitParticles(player.x, player.y+player.r, 8, '#FFB3C6', 2);
   }
 }
 
 document.addEventListener('keydown', function(e) {
+  // Tutorial dialogue: space = advance
+  if (gameState === STATE.TUTORIAL && e.code === 'Space') {
+    e.preventDefault();
+    advanceTDialogue();
+    return;
+  }
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
     e.preventDefault();
     if (gameState === STATE.OVER) { restartGame(); return; }
@@ -824,7 +1339,7 @@ document.addEventListener('keydown', function(e) {
   }
   if (e.code === 'ArrowDown' || e.code === 'KeyS') {
     e.preventDefault();
-    if (gameState === STATE.PLAYING || gameState === STATE.BOSS) player.crouch(true);
+    if (gameState === STATE.PLAYING || gameState === STATE.BOSS || gameState === STATE.TUTORIAL_PLAY) player.crouch(true);
   }
   if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
     e.preventDefault(); shiftHeld = true;
@@ -835,27 +1350,399 @@ document.addEventListener('keyup', function(e) {
   if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') { e.preventDefault(); shiftHeld = false; }
   if (e.code === 'ArrowDown' || e.code === 'KeyS') {
     e.preventDefault();
-    if (gameState === STATE.PLAYING || gameState === STATE.BOSS) player.crouch(false);
+    if (gameState === STATE.PLAYING || gameState === STATE.BOSS || gameState === STATE.TUTORIAL_PLAY) player.crouch(false);
   }
 });
 
 canvas.addEventListener('pointerdown', function(e) {
   e.preventDefault();
+  if (gameState === STATE.TUTORIAL) { advanceTDialogue(); return; }
   if (gameState === STATE.OVER) { restartGame(); return; }
   doJump();
 });
 
-// Button handlers - use onclick for reliability
-btnStart.onclick = function(e) { e.preventDefault(); e.stopPropagation(); startGame(); };
+// ── Coin icon drawing ──
+function drawCoinIcon() {
+  var cx = coinCtx, s = 10;
+  cx.clearRect(0, 0, 28, 28);
+  // Pink circle
+  for (var py = -s; py <= s; py++) {
+    var dx = Math.floor(Math.sqrt(Math.max(0, s*s - py*py)));
+    if (dx <= 0) continue;
+    cx.fillStyle = '#FF80AB';
+    cx.fillRect(14+py, 14-dx, 1, dx*2+1);
+  }
+  // Inner lighter circle
+  for (var py = -7; py <= 7; py++) {
+    var dx = Math.floor(Math.sqrt(Math.max(0, 49 - py*py)));
+    if (dx <= 0) continue;
+    cx.fillStyle = '#FFD0DD';
+    cx.fillRect(14+py, 14-dx, 1, dx*2+1);
+  }
+  // Heart in center
+  cx.fillStyle = '#FF4088';
+  cx.fillRect(12, 12, 2, 2); cx.fillRect(16, 12, 2, 2);
+  cx.fillRect(10, 14, 8, 1);
+  cx.fillRect(11, 15, 6, 1);
+  cx.fillRect(12, 16, 4, 1);
+  cx.fillRect(13, 17, 2, 1);
+}
+
+// Button handlers
+btnStart.onclick = function(e) { e.preventDefault(); e.stopPropagation(); hideAllOverlays(); levelScreen.classList.add('show'); buildLevelGrid(); };
+btnBackToMenu.onclick = function(e) { e.preventDefault(); e.stopPropagation(); hideAllOverlays(); startScreen.classList.add('show'); };
 btnRestart.onclick = function(e) { e.preventDefault(); e.stopPropagation(); restartGame(); };
 btnMenu.onclick = function(e) { e.preventDefault(); e.stopPropagation(); goToMenu(); };
 btnWinMenu.onclick = function(e) { e.preventDefault(); e.stopPropagation(); goToMenu(); };
 btnNext.onclick = function(e) { e.preventDefault(); e.stopPropagation(); nextLevel(); };
 
-// Prevent double-tap zoom
+// Prevent double-tap zoom — but let buttons/overlays work
 document.addEventListener('touchstart', function(e) {
+  if (e.target.closest('button') || e.target.closest('.overlay')) return; // let UI work
   if (e.target.closest('#gameContainer')) e.preventDefault();
 }, { passive: false });
+
+// ── Mobile: swipe down = jump, continuous swipe = continuous jump ──
+var touchStartY = 0;
+
+canvas.addEventListener('touchstart', function(e) {
+  if (gameState !== STATE.PLAYING && gameState !== STATE.BOSS) return;
+  e.preventDefault();
+  touchStartY = e.changedTouches[0].clientY;
+}, { passive: false });
+
+canvas.addEventListener('touchmove', function(e) {
+  if (gameState !== STATE.PLAYING && gameState !== STATE.BOSS) return;
+  e.preventDefault();
+  var dy = touchStartY - e.changedTouches[0].clientY;
+  // Finger moved up ≥10px → jump, reset anchor
+  if (dy > 10) {
+    doJump();
+    touchStartY = e.changedTouches[0].clientY;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', function(e) {
+  if (gameState !== STATE.PLAYING && gameState !== STATE.BOSS) return;
+  var dy = touchStartY - e.changedTouches[0].clientY;
+  // Tap without swipe → jump
+  if (Math.abs(dy) < 10) doJump();
+});
+
+// ── TUTORIAL ──
+function drawFairy(x, y) {
+  var fx = x, fy = y;
+  tFairyAnim += 0.04;
+  var bob = Math.sin(tFairyAnim)*3;
+  ctx.fillStyle = 'rgba(255,220,240,0.3)';
+  ctx.beginPath(); ctx.arc(fx+4, fy-2+bob, 16, 0, Math.PI*2); ctx.fill();
+  var wf = Math.sin(tFairyAnim*2.5)*5;
+  ctx.fillStyle = 'rgba(255,200,230,0.8)';
+  ctx.beginPath(); ctx.ellipse(fx-6, fy-6+bob+wf, 10, 14, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(200,230,255,0.6)';
+  ctx.beginPath(); ctx.ellipse(fx-4, fy-4+bob+wf*0.7, 7, 10, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,200,230,0.8)';
+  ctx.beginPath(); ctx.ellipse(fx+12, fy-6+bob-wf, 10, 14, 0.3, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(200,230,255,0.6)';
+  ctx.beginPath(); ctx.ellipse(fx+10, fy-4+bob-wf*0.7, 7, 10, 0.3, 0, Math.PI*2); ctx.fill();
+  FR(fx-1, fy+bob, 8, 10, '#FFB3C6'); FR(fx, fy+bob, 6, 8, '#FFD0DD');
+  ctx.fillStyle = '#FFD0DD';
+  ctx.beginPath(); ctx.moveTo(fx-1, fy+10+bob); ctx.lineTo(fx-4, fy+17+bob); ctx.lineTo(fx+10, fy+17+bob); ctx.lineTo(fx+7, fy+10+bob); ctx.fill();
+  ctx.fillStyle = '#FFB3C6';
+  ctx.beginPath(); ctx.moveTo(fx, fy+11+bob); ctx.lineTo(fx-2, fy+16+bob); ctx.lineTo(fx+8, fy+16+bob); ctx.lineTo(fx+6, fy+11+bob); ctx.fill();
+  FR(fx, fy-8+bob, 8, 9, '#FFE0E8'); FR(fx+1, fy-7+bob, 6, 7, '#FFF0F5');
+  ctx.fillStyle = '#FF80AB';
+  ctx.beginPath(); ctx.arc(fx+4, fy-10+bob, 6, Math.PI, 2*Math.PI); ctx.fill();
+  FR(fx, fy-12+bob, 3, 4, '#FF80AB'); FR(fx+5, fy-12+bob, 3, 4, '#FF80AB');
+  FR(fx-1, fy-10+bob, 2, 6, '#FF80AB'); FR(fx+7, fy-10+bob, 2, 6, '#FF80AB');
+  FR(fx+2, fy-6+bob, 3, 3, '#FFF'); FR(fx+5, fy-6+bob, 3, 3, '#FFF');
+  FR(fx+3, fy-5+bob, 2, 2, '#2D1B2E'); FR(fx+6, fy-5+bob, 2, 2, '#2D1B2E');
+  FR(fx+3, fy-6+bob, 1, 1, '#FFF'); FR(fx+6, fy-6+bob, 1, 1, '#FFF');
+  FR(fx+1, fy-3+bob, 2, 1, 'rgba(255,150,180,0.5)'); FR(fx+6, fy-3+bob, 2, 1, 'rgba(255,150,180,0.5)');
+  ctx.fillStyle = '#E06080'; FR(fx+3, fy-2+bob, 3, 1, '#E06080');
+  FR(fx+8, fy-4+bob, 1, 10, '#FFD700');
+  ctx.fillStyle = '#FFE44D'; FR(fx+6, fy-6+bob, 5, 5, '#FFE44D'); FR(fx+7, fy-7+bob, 3, 3, '#FFF');
+  ctx.fillStyle = '#FF80AB'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('yan', fx+4, fy+22+bob); ctx.textAlign = 'start';
+}
+
+function startTutorial(stage) {
+  initAudio(); resize();
+  tStage = stage; tPhase = 0;
+  player.reset(); obstacles = []; particles = [];
+  bossProjectiles = []; playerProjectiles = [];
+  obstaclesPassed = 0; bossActive = false; bossFought = false;
+  shakeAmt = 0; invincibleTimer = 0;
+  gameState = STATE.TUTORIAL;
+  hideAllOverlays();
+  if (!bgmPlaying) playBGM('normal');
+  tFairyX = W - 80; tFairyY = GROUND_Y - 60;
+  setTDialogue(tDialogues[tStage][0]);
+  if (animId) cancelAnimationFrame(animId);
+  tutorialLoop();
+}
+
+function startTPlay() {
+  gameState = STATE.TUTORIAL_PLAY;
+  obstacles = []; particles = [];
+  player.reset(); obstaclesPassed = 0;
+  bossActive = false; bossProjectiles = []; playerProjectiles = [];
+  invincibleTimer = 0;
+  if (tStage === 0) {
+    obstacles.push({x:W+40,y:GROUND_Y-36,w:22,h:36,draw:drawSpike,passed:false});
+    obstacles.push({x:W+170,y:GROUND_Y-56,w:26,h:56,draw:drawBlock,passed:false});
+  } else if (tStage === 1) {
+    obstacles.push({x:W+40,y:GROUND_Y-30,w:60,h:14,draw:drawBarrier,passed:false});
+    obstacles.push({x:W+190,y:GROUND_Y-30,w:40,h:14,draw:drawLowBird,passed:false});
+  } else {
+    bossActive = true; bossType = 0;
+    bossX = W - 100; bossY = GROUND_Y - bossH;
+    bossProjectiles = []; playerProjectiles = [];
+    bossTimer = 0; tBossShootTimer = 0;
+    tutorialBossHP = 30;
+  }
+}
+
+function tutorialLoop() {
+  if (gameState !== STATE.TUTORIAL && gameState !== STATE.TUTORIAL_PLAY) return;
+  updateClouds();
+  if (gameState === STATE.TUTORIAL) {
+    drawBackground(); drawClouds(); drawFlowers();
+    for (var i = 0; i < obstacles.length; i++) obstacles[i].draw(obstacles[i]);
+    for (var i = 0; i < bossProjectiles.length; i++) {
+      var p = bossProjectiles[i];
+      FR(p.x-p.r,p.y-p.r,p.r*2,p.r*2,'#4488FF');FR(p.x-p.r+1,p.y-p.r+1,p.r*2-2,p.r*2-2,'#66AAFF');FR(p.x-2,p.y-2,4,4,'#FFF');
+    }
+    drawParticles(); player.draw();
+    if (bossActive) drawBoss();
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, 0, W, H);
+    drawFairy(tFairyX, tFairyY);
+    drawTDialogue(); updateTDialogue();
+  } else if (gameState === STATE.TUTORIAL_PLAY) {
+    player.update();
+    var spd = 5.5;
+    for (var i = obstacles.length-1; i >= 0; i--) {
+      obstacles[i].x -= spd;
+      if (obstacles[i].x + obstacles[i].w < -40) obstacles.splice(i,1);
+      else if (!obstacles[i].passed && obstacles[i].x + obstacles[i].w < player.x - player.r) {
+        obstacles[i].passed = true; obstaclesPassed++;
+      }
+    }
+    if (tStage === 2) {
+      updateTutorialBoss();
+      for (var i = playerProjectiles.length-1; i >= 0; i--) {
+        var p = playerProjectiles[i]; p.x += p.vx; p.y += p.vy; p.life--;
+        if (p.x > W+20 || p.life <= 0) { playerProjectiles.splice(i,1); continue; }
+        if (p.x+p.r > bossX && p.x-p.r < bossX+bossW && p.y+p.r > bossY && p.y-p.r < bossY+bossH) {
+          tutorialBossHP -= 3; playerProjectiles.splice(i,1); sfxBossHit();
+          if (tutorialBossHP <= 0) { tutorialWin(); return; }
+        }
+      }
+    }
+    updateParticles();
+    drawBackground(); drawClouds(); drawFlowers();
+    for (var i = 0; i < obstacles.length; i++) obstacles[i].draw(obstacles[i]);
+    for (var i = 0; i < bossProjectiles.length; i++) {
+      var p = bossProjectiles[i];
+      FR(p.x-p.r,p.y-p.r,p.r*2,p.r*2,'#4488FF');FR(p.x-p.r+1,p.y-p.r+1,p.r*2-2,p.r*2-2,'#66AAFF');FR(p.x-2,p.y-2,4,4,'#FFF');
+    }
+    for (var i = 0; i < playerProjectiles.length; i++) {
+      var p = playerProjectiles[i];
+      FR(p.x-p.r,p.y-p.r,p.r*2,p.r*2,'#FFD0DD');FR(p.x-p.r+1,p.y-p.r+1,p.r*2-2,p.r*2-2,'#FFF');
+    }
+    drawParticles(); player.draw();
+    if (bossActive) { drawBoss(); drawTutorialBossBar(); }
+    if (tStage <= 1 && obstaclesPassed >= 2 && obstacles.length === 0) { tutorialWin(); return; }
+    for (var i = 0; i < obstacles.length; i++) {
+      if (hitTest(player, obstacles[i])) { tutorialFail(); return; }
+    }
+    for (var i = 0; i < bossProjectiles.length; i++) {
+      var p = bossProjectiles[i]; var pb = player.getBounds();
+      if (p.x-p.r < pb.right && p.x+p.r > pb.left && p.y-p.r < pb.bottom && p.y+p.r > pb.top) {
+        tutorialFail(); return;
+      }
+    }
+  }
+  animId = requestAnimationFrame(tutorialLoop);
+}
+
+function tutorialWin() {
+  player.reset(); obstacles = []; bossProjectiles = []; playerProjectiles = [];
+  bossActive = false;
+  if (tStage === 2) {
+    // st3: show dialogue first → confetti + win on space
+    totalCoins += 20; saveCoins();
+    coinCountEl.textContent = totalCoins;
+    if (unlockedLevel < 1) { unlockedLevel = 1; localStorage.setItem('pjUnlocked', '1'); }
+    gameState = STATE.TUTORIAL;
+    setTDialogue(tWinMsg);
+    return;
+  }
+  // st1/st2: win screen directly
+  gameState = STATE.IDLE;
+  if (animId) cancelAnimationFrame(animId);
+  sfxWin();
+  var name = tStage===0?'st1-跳跃':'st2-下蹲';
+  winLevelEl.textContent = name;
+  winRewardEl.textContent = '0';
+  hideAllOverlays();
+  winScreen.classList.add('show');
+  btnWinMenu.style.display = 'inline-block';
+  btnWinMenu.textContent = '↩ 返回游戏界面';
+  btnNext.style.display = 'inline-block';
+  btnNext.textContent = '▶ 下一阶段';
+  buildLevelGrid();
+}
+
+function tutorialNext() {
+  if (tStage === 0) { startTutorial(1); }
+  else if (tStage === 1) { startTutorial(2); }
+  else { currentLevel = 1; buildLevelGrid(); startGame(); }
+}
+
+function drawTutorialCongrats() {}
+var tCongratsBtn = { x: 0, y: 0, w: 0, h: 0 };
+function tCongratsNext() {}
+
+var lastWasTutorial = false;
+function tutorialFail() {
+  lastWasTutorial = true;
+  player.reset(); obstacles = []; bossProjectiles = []; playerProjectiles = [];
+  bossActive = false;
+  gameState = STATE.OVER;
+  if (animId) cancelAnimationFrame(animId);
+  sfxHit(); triggerShake();
+  emitParticles(player.x, player.y, 20, '#FFF', 3);
+  emitParticles(player.x, player.y, 10, '#FF4088', 2);
+  finalScoreEl.textContent = '0';
+  goLevelEl.textContent = 'st'+(tStage+1);
+  saveHS();
+  hideAllOverlays();
+  gameOverScreen.classList.add('show');
+}
+
+function updateTDialogue() {
+  var full = tDialogue.join('');
+  if (tCharIdx >= full.length) return;
+  tCharTimer++;
+  if (tCharTimer >= 2) { tCharTimer = 0; tCharIdx++; beep(800+Math.random()*400,0.03,'square',0.008); }
+}
+
+function drawTDialogue() {
+  var full = tDialogue.join('');
+  var shown = full.substring(0, tCharIdx);
+  if (shown.length === 0) return;
+  var bw = 420, bh = 32, bx = Math.floor(W/2 - bw/2), by = Math.floor(H/2 - bh/2);
+  ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(bx, by, bw, bh);
+  ctx.strokeStyle = '#FF80AB'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, bw, bh);
+  ctx.fillStyle = '#FFF'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+  ctx.fillText(shown, W/2, by+21); ctx.textAlign = 'start';
+  if (tCharIdx >= full.length && Math.floor(Date.now()/500)%2 === 0) {
+    ctx.fillStyle = '#FFD0DD'; ctx.font = '10px monospace';
+    ctx.fillText('[ 按空格继续 ]', W/2, by+bh+14);
+  }
+}
+
+function advanceTDialogue() {
+  var full = tDialogue.join('');
+  if (tCharIdx < full.length) { tCharIdx = full.length; return; }
+  // Handle st3 win message
+  if (tStage === 2 && tDialogue[0] === tWinMsg[0]) {
+    unlockAch(2); // 教程毕业
+    sfxWin(); stopBGM();
+    for (var i = 0; i < 60; i++) {
+      particles.push({x:W/2,y:H/2,vx:(Math.random()-0.5)*6,vy:-2-Math.random()*5,life:40+Math.random()*30,max:70,color:['#FF4088','#FF80AB','#FFD0DD','#FFF','#FFD700'][Math.floor(Math.random()*5)],size:2+Math.floor(Math.random()*4)});
+    }
+    gameState = STATE.IDLE;
+    winLevelEl.textContent = 'st3-Boss';
+    winRewardEl.textContent = '20';
+    hideAllOverlays(); winScreen.classList.add('show');
+    btnWinMenu.style.display = 'inline-block';
+    btnWinMenu.textContent = '↩ 返回游戏界面';
+    btnNext.style.display = 'inline-block';
+    btnNext.textContent = '▶ 开始第一关';
+    buildLevelGrid();
+    if (animId) cancelAnimationFrame(animId);
+    return;
+  }
+  tPhase++;
+  var dials = tDialogues[tStage];
+  if (tPhase < dials.length) {
+    setTDialogue(dials[tPhase]);
+  } else {
+    startTPlay();
+  }
+}
+
+function drawTutorialBossBar() {
+  var bw = 200, bh = 14, bx = Math.floor(W/2-bw/2), by = 14;
+  FR(bx-2,by-2,bw+4,bh+4,'#C03050');FR(bx,by,bw,bh,'#3D2035');
+  var fw = Math.floor(bw*(tutorialBossHP/30));
+  if (fw>0) FR(bx,by,fw,bh,'#FF6090');
+  ctx.fillStyle='#FFF';ctx.font='bold 9px monospace';ctx.textAlign='center';
+  ctx.fillText('BOSS '+tutorialBossHP+'/30',bx+bw/2,by+11);ctx.textAlign='start';
+}
+
+function updateTutorialBoss() {
+  bossTimer++;
+  bossY = GROUND_Y - bossH + Math.sin(bossTimer*0.03)*20;
+  tBossShootTimer++;
+  if (tBossShootTimer >= 70) {
+    tBossShootTimer = 0;
+    var dx = player.x - bossX, dy = player.y - bossY;
+    var dist = Math.sqrt(dx*dx+dy*dy)||1;
+    bossProjectiles.push({x:bossX-10,y:bossY+bossH/2,vx:(dx/dist)*3,vy:(dy/dist)*3,r:5,life:200});
+  }
+  for (var i = bossProjectiles.length-1; i >= 0; i--) {
+    var p = bossProjectiles[i]; p.x += p.vx; p.y += p.vy; p.life--;
+    if (p.x < -20 || p.life <= 0) bossProjectiles.splice(i,1);
+  }
+}
+
+// ── Achievement panel ──
+var achPanel = document.getElementById('achPanel');
+var achGrid = document.getElementById('achGrid');
+var achHeartCanvas = document.getElementById('achHeartCanvas');
+var achHeartCtx = achHeartCanvas.getContext('2d');
+achHeartCanvas.width = 28; achHeartCanvas.height = 28;
+achHeartCtx.imageSmoothingEnabled = false;
+var btnCloseAch = document.getElementById('btnCloseAch');
+
+// Draw pixel heart on button
+function drawAchHeartBtn() {
+  var cx = achHeartCtx;
+  cx.clearRect(0, 0, 28, 28);
+  var hd = [[0,1,0,0,1,0],[1,1,1,1,1,1],[1,1,1,1,1,1],[0,1,1,1,1,0],[0,0,1,1,0,0],[0,0,0,1,0,0]];
+  var ps = 3;
+  var offX = 2, offY = 2;
+  for (var py = 0; py < hd.length; py++) {
+    for (var px = 0; px < hd[0].length; px++) {
+      if (hd[py][px]) {
+        var dx = offX + px*ps, dy = offY + py*ps;
+        cx.fillStyle = '#FF4088'; cx.fillRect(dx, dy, ps, ps);
+        var isEdge = (py>0&&!hd[py-1][px])||(py<hd.length-1&&!hd[py+1][px])||(px>0&&!hd[py][px-1])||(px<hd[0].length-1&&!hd[py][px+1]);
+        if (isEdge) { cx.fillStyle = '#C03050'; cx.fillRect(dx, dy, ps, ps); }
+      }
+    }
+  }
+}
+drawAchHeartBtn();
+
+achHeartCanvas.onclick = function(e) { e.stopPropagation(); renderAchPanel(); achPanel.classList.add('show'); };
+function renderAchPanel() {
+  achGrid.innerHTML = '';
+  for (var i = 0; i < achDefs.length; i++) {
+    var d = achDefs[i];
+    var cell = document.createElement('div');
+    cell.className = 'ach-cell ' + (achUnlocked.indexOf(d.id) >= 0 ? 'unlocked' : 'locked');
+    cell.innerHTML = '<span class="ach-icon">' + (achUnlocked.indexOf(d.id) >= 0 ? d.icon : '❓') + '</span><span>' + (achUnlocked.indexOf(d.id) >= 0 ? d.name : '???') + '</span>';
+    achGrid.appendChild(cell);
+  }
+}
+btnCloseAch.onclick = function(e) { e.stopPropagation(); achPanel.classList.remove('show'); };
+
+// Hook achievement checks into game flow
+function hookAchs() { checkAchs(); }
 
 // ── INIT ──
 function init() {
@@ -864,7 +1751,8 @@ function init() {
   initClouds(); initFlowers();
   player.reset();
   highScoreEl.textContent = highScore;
-  buildLevelGrid();
+  drawCoinIcon();
+  coinCountEl.textContent = totalCoins;
   gameState = STATE.IDLE;
   startScreen.classList.add('show');
   idleLoop();
